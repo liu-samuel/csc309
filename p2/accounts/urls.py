@@ -1,5 +1,5 @@
 from django.urls import path
-from .models import ContactRequestView
+from .views import ContactRequestView
 
 app_name = 'accounts'
 

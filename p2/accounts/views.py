@@ -5,6 +5,7 @@ class ContactRequestView():
     model = ContactRequest
     
     def get():
-        
+        return
 
     def post():
+        return
