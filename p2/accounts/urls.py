@@ -1,8 +1,8 @@
 from django.urls import path
-from .views import ContactRequestView
+from .views import ContactRequestAPIView
 
 app_name = 'accounts'
 
 urlpatterns = [
-    path('contact_request/', ContactRequestView.as_view(), name="contact_request")
+    path('contact_request/', ContactRequestAPIView.as_view(), name="contact_request"),
 ]
