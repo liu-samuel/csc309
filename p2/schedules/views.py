@@ -55,6 +55,16 @@ class EventAPIView(generics.CreateAPIView):
         serializer = EventSerializer(event)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def delete(self, request, **kwargs):
+        event_id = kwargs["event_id"]
+
+        try:
+            event = Event.objects.get(pk=event_id)
+        except:
+            return Response({'error': f'Event does not exist with id {event_id}'}, status=status.HTTP_404_NOT_FOUND)
+        
+        event.delete()
+        return Response({'message': 'Event deleted successfully'}, status=status.HTTP_200_OK)
         
 
 
