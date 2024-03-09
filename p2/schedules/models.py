@@ -8,11 +8,11 @@ class Event(models.Model):
 
 class Availability(models.Model):
     class AvailabilityType(models.TextChoices):
-        preferred = "preferred", _("preferred")
-        available = "available", _("available")
+        PREFERRED = "preferred", _("preferred")
+        AVAILABLE = "available", _("available")
 
     person = models.ForeignKey(User, on_delete=models.CASCADE, related_name='person')
     start_time = models.DateTimeField(null=False)
     end_time = models.DateTimeField(null=False)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='requests_sent')
-    type = models.CharField(choices=AvailabilityType, default=AvailabilityType.available, max_length=9)
+    type = models.CharField(choices=AvailabilityType, default=AvailabilityType.AVAILABLE, max_length=9)
