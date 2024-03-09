@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class Event(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="owner")
     invitee = models.ForeignKey(User, on_delete=models.CASCADE, related_name="invitee")
-    deadline = models.DateTimeField()
+    deadline = models.DateTimeField(blank=True, null=True)
     name = models.CharField(max_length=50, blank=True)
     is_finalized = models.BooleanField()
     selected_time = models.DateTimeField(null=True)
