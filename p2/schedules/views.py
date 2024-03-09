@@ -9,10 +9,15 @@ from .models import Event, Availability
 from .serializers import EventSerializer, AvailabilitySerializer
 
 class EventAPIView(generics.CreateAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, **kwargs):
         event_id = kwargs["event_id"]
+
+        try:
+            event = Event.objects.get(pk=event_id)
+        except:
+            return Response({'error': f'Event does not exist with id {event_id}'}, status=status.HTTP_404_NOT_FOUND)
 
         try:
             availabilities = Availability.objects.filter(event__pk=event_id)
@@ -20,8 +25,39 @@ class EventAPIView(generics.CreateAPIView):
             return Response({'error': 'Cannot get availabilities for event'}, status=status.HTTP_404_NOT_FOUND)
 
 
+        # TODO select overlap, and return the overlap
+
         return Response("Hello, " + str(kwargs["event_id"]), status=200)
     
+
+    def patch(self, request, **kwargs):
+        event_id = kwargs["event_id"]
+
+        try:
+            event = Event.objects.get(pk=event_id)
+        except:
+            return Response({'error': f'Event does not exist with id {event_id}'}, status=status.HTTP_404_NOT_FOUND)
+        
+        is_finalized = request.POST.get("is_finalized")
+        name = request.POST.get("name")
+        selected_time = request.POST.get("selected_time")
+
+        # if any of these were not passed in, don't update that value
+        if is_finalized != None:
+            event.is_finalized = is_finalized
+        if name != None:
+            event.name = name
+        if selected_time != None:
+            event.selected_time = selected_time
+
+        event.save()
+
+        serializer = EventSerializer(event)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        
+
+
 
 class EventAvailabilityAPIView(generics.CreateAPIView):
     # permission_classes = [permissions.IsAuthenticated]
@@ -30,7 +66,6 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
         event_id = kwargs["event_id"]
 
         try:
-            print(request.POST)
             user_email = request.POST.get('email')
             start_time = request.POST.get('start_time')
             end_time = request.POST.get('end_time')
@@ -69,4 +104,9 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+    def delete(self, request, **kwargs):
+        event_id = kwargs["event_id"]
+
+        # if no specific availability specified assume it wants to delete all availability
 
