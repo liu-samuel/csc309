@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import Event, Availability
 from .serializers import EventSerializer, AvailabilitySerializer
+from .utils import time_orders_valid, start_end_same_day, round_time, split_into_increments
 
 class EventAPIView(generics.CreateAPIView):
     # permission_classes = [permissions.IsAuthenticated]
@@ -85,34 +86,58 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
             return Response({'error': 'Missing parameter(s); email, start_time, end_time or type'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            print(user_email)
             user = get_user_model().objects.get(email=user_email)
         except get_user_model().DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         
-        # TODO: validation: check event_id
 
-        # TODO: round start and end time to nearest hour
-        # TODO: validation: make sure start time and end time are on the same day
-        # TODO: validation: make sure start time < end time
-        # TODO: validation: make sure start and end time are not in the future
+        # validation: make sure start time < end time
+        if not time_orders_valid(start_time, end_time):
+            return Response({'error': 'Start time is after end time'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # TODO: validation: check for start/end time overlap
+        # validation: make sure start time and end time are on the same day
+        #       UNLESS, end_time is 12:00am. Then it can be the next day
+        if not start_end_same_day(start_time, end_time):
+            return Response({'error': 'Start and end times must be the same day'}, status=status.HTTP_400_BAD_REQUEST)
 
-        availability_data = {
-            'person': user.pk,
-            'start_time': start_time,
-            'end_time': end_time,
-            'event': event_id,
-            'type': availability_type
-        }
+        # round start and end time to nearest 30 minute
+        start_time = round_time(start_time)
+        end_time = round_time(end_time)
 
-        serializer = AvailabilitySerializer(data=availability_data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # split into 30 minute increments
+        increments = split_into_increments(start_time, end_time)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # validation: check event_id
+        try:
+            event = Event.objects.get(pk=event_id)
+        except:
+            return Response({'error': f'Event does not exist with id {event_id}'}, status=status.HTTP_404_NOT_FOUND)
+
+
+        creation_data = []
+
+        # validation: check for start/end time overlap
+        for increment in increments:
+            availability = Availability.objects.filter(event_id=event_id).filter(start_time=increment[0], end_time=increment[1])
+            if len(availability) > 0:
+                return Response({'error': f'You are already available between {increment[0], increment[1]}'}, status=status.HTTP_400_BAD_REQUEST)
+
+            availability_data = {
+                'person': user.pk,
+                'start_time': increment[0],
+                'end_time': increment[1],
+                'event': event_id,
+                'type': availability_type
+            }
+
+            serializer = AvailabilitySerializer(data=availability_data)
+            if serializer.is_valid():
+                serializer.save()
+                creation_data.append(serializer.data)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response(creation_data, status=status.HTTP_201_CREATED)
 
 
     def delete(self, request, **kwargs):
