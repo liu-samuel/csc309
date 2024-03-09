@@ -1,13 +1,15 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Event
 from .serializers import EventSerializer
 from django.core import serializers
+
+import json
 
 class EventsListAPIView(generics.CreateAPIView):
     # permission_classes = [permissions.IsAuthenticated]
@@ -16,17 +18,22 @@ class EventsListAPIView(generics.CreateAPIView):
         owner = request.query_params.get("owner")
         invitee = request.query_params.get("invitee")
         is_finalized = request.query_params.get("is_finalized")
-
+        
+        if is_finalized:
+            if is_finalized.lower() == "false":
+                is_finalized = False
+            elif is_finalized.lower() == "true":
+                is_finalized = True
+        
         try:
-            events = Event.objects.filter(owner=owner, invitee=invitee, is_finalized=is_finalized)
-        except:
+            events = Event.objects.filter(owner__pk=owner, invitee__pk=invitee, is_finalized=bool(is_finalized))
+        except Exception:
             return Response({'error': 'Cannot get availabilities for event'}, status=status.HTTP_404_NOT_FOUND)
         
         try:
             events_response = serializers.serialize('json', events)
-
-            return Response(events_response, status=status.HTTP_201_CREATED)
-        except:
+            return Response(json.loads(events_response), status=status.HTTP_200_OK)
+        except Exception:
             return Response({'error': 'Serialization error'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -37,13 +44,17 @@ class EventsListAPIView(generics.CreateAPIView):
         name = request.POST.get("name")
         is_finalized = False
         selected_time = None
-
-        # necessary due to serializer
-        if not name:
-            name = ""
         
-        # TODO validations
+        # validations
+        try:
+            owner_user = User.objects.get(pk=owner)
+            invitee_user = User.objects.get(pk=invitee)
 
+            if not name: # necessary due to serializer
+                name = f'{owner_user.first_name} / {invitee_user.first_name}'
+        except User.DoesNotExist:
+            return Response({'error': 'User(s) not found'}, status=status.HTTP_404_NOT_FOUND)
+        
         event_data = {
             "owner": owner,
             "invitee": invitee,
@@ -56,7 +67,10 @@ class EventsListAPIView(generics.CreateAPIView):
         serializer = EventSerializer(data=event_data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            response = Response(serializer.data, status=status.HTTP_201_CREATED)
+
+            # TODO: send email request
+            return response
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
