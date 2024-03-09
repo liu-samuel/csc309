@@ -4,13 +4,16 @@ from rest_framework import status, generics, permissions
 from django.contrib.auth import get_user_model
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.db import transaction
 
 from .models import Event, Availability
 from .serializers import EventSerializer, AvailabilitySerializer
-from .utils import time_orders_valid, start_end_same_day, round_time, split_into_increments
+from .utils import time_orders_valid, start_end_same_day, round_time, split_into_increments, OverlapException
+
+import json
 
 class EventAPIView(generics.CreateAPIView):
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, **kwargs):
         event_id = kwargs["event_id"]
@@ -21,14 +24,19 @@ class EventAPIView(generics.CreateAPIView):
             return Response({'error': f'Event does not exist with id {event_id}'}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            availabilities = Availability.objects.filter(event__pk=event_id)
+            all_availabilities = Availability.objects.filter(event__pk=event_id)
         except:
             return Response({'error': 'Cannot get availabilities for event'}, status=status.HTTP_404_NOT_FOUND)
 
 
-        # TODO select overlap, and return the overlap
+        event_data = EventSerializer(event).data
 
-        return Response("Hello, " + str(kwargs["event_id"]), status=200)
+        availabilities = [AvailabilitySerializer(availability).data for availability in all_availabilities]
+
+        event_data["availabilities"] = availabilities
+
+
+        return Response(event_data, status=200)
     
 
     def patch(self, request, **kwargs):
@@ -71,8 +79,14 @@ class EventAPIView(generics.CreateAPIView):
 
 
 class EventAvailabilityAPIView(generics.CreateAPIView):
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
+
+    """
+    Adds availabilities between start_time and end_date.
+    If a specific 30-minute increment already exists, returns an error and does not update the database.
+    """
+    @transaction.atomic
     def post(self, request, **kwargs):
         event_id = kwargs["event_id"]
 
@@ -117,31 +131,155 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
         creation_data = []
 
         # validation: check for start/end time overlap
-        for increment in increments:
-            availability = Availability.objects.filter(event_id=event_id).filter(start_time=increment[0], end_time=increment[1])
-            if len(availability) > 0:
-                return Response({'error': f'You are already available between {increment[0], increment[1]}'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            with transaction.atomic():
+                for increment in increments:
+                    availability = Availability.objects.filter(event_id=event_id).filter(start_time=increment[0], end_time=increment[1], person_id=user.pk)
+                    if len(availability) > 0:
+                        raise OverlapException(f"You are already available between {increment[0], increment[1]}")
 
-            availability_data = {
-                'person': user.pk,
-                'start_time': increment[0],
-                'end_time': increment[1],
-                'event': event_id,
-                'type': availability_type
-            }
+                    availability_data = {
+                        'person': user.pk,
+                        'start_time': increment[0],
+                        'end_time': increment[1],
+                        'event': event_id,
+                        'type': availability_type
+                    }
 
-            serializer = AvailabilitySerializer(data=availability_data)
-            if serializer.is_valid():
-                serializer.save()
-                creation_data.append(serializer.data)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    serializer = AvailabilitySerializer(data=availability_data)
+                    if serializer.is_valid():
+                        serializer.save()
+                        creation_data.append(serializer.data)
+                    else:
+                        raise Exception(serializer.errors)
+                
+                return Response(creation_data, status=status.HTTP_201_CREATED)
+        except OverlapException as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(json.dumps(str(e)), status=status.HTTP_400_BAD_REQUEST)
+
+
+    """
+    Replaces all availabilities between start_time and end_date.
+    If a specific 30-minute increment does not exist, returns an error and does not update the database.
+    """
+    @transaction.atomic
+    def put(self, request, **kwargs):
+        event_id = kwargs["event_id"]
+
+        try:
+            user_email = request.POST.get('email')
+            start_time = request.POST.get('start_time')
+            end_time = request.POST.get('end_time')
+            availability_type = request.POST.get('type')
+        except Exception as e:
+            return Response({'error': 'Missing parameter(s); email, start_time, end_time or type'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = get_user_model().objects.get(email=user_email)
+        except get_user_model().DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         
-        return Response(creation_data, status=status.HTTP_201_CREATED)
+
+        # validation: make sure start time < end time
+        if not time_orders_valid(start_time, end_time):
+            return Response({'error': 'Start time is after end time'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # validation: make sure start time and end time are on the same day
+        #       UNLESS, end_time is 12:00am. Then it can be the next day
+        if not start_end_same_day(start_time, end_time):
+            return Response({'error': 'Start and end times must be the same day'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # round start and end time to nearest 30 minute
+        start_time = round_time(start_time)
+        end_time = round_time(end_time)
+
+        # split into 30 minute increments
+        increments = split_into_increments(start_time, end_time)
+
+        # validation: check event_id
+        try:
+            event = Event.objects.get(pk=event_id)
+        except:
+            return Response({'error': f'Event does not exist with id {event_id}'}, status=status.HTTP_404_NOT_FOUND)
 
 
+        update_data = []
+
+        # validation: check for start/end time overlap
+        try:
+            with transaction.atomic():
+                for increment in increments:
+                    availability = Availability.objects.filter(event_id=event_id).filter(start_time=increment[0], end_time=increment[1], person_id=user.pk)
+                    if not availability:
+                        raise OverlapException(f"There is no current availability between {increment[0], increment[1]}")
+
+                    availability = availability.get()
+
+                    availability.type = availability_type
+
+                    serializer = AvailabilitySerializer(availability)
+                    availability.save()
+                    update_data.append(serializer.data)
+                
+                return Response(update_data, status=status.HTTP_201_CREATED)
+        except OverlapException as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(json.dumps(str(e)), status=status.HTTP_400_BAD_REQUEST)
+
+    """
+    Delete all availabilities between start_time and end_time (assuming they're on the same date).
+    If a specific 30-minute increment does not have an availability for this user, ignore it and keep deleting next increments
+    """
     def delete(self, request, **kwargs):
         event_id = kwargs["event_id"]
 
-        # if no specific availability specified assume it wants to delete all availability
+        try:
+            user_email = request.POST.get('email')
+            start_time = request.POST.get('start_time')
+            end_time = request.POST.get('end_time')
+        except Exception as e:
+            print(e)
+            return Response({'error': 'Missing parameter(s); email, start_time, end_time or type'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = get_user_model().objects.get(email=user_email)
+        except get_user_model().DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+        # validation: make sure start time < end time
+        if not time_orders_valid(start_time, end_time):
+            return Response({'error': 'Start time is after end time'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # validation: make sure start time and end time are on the same day
+        #       UNLESS, end_time is 12:00am. Then it can be the next day
+        if not start_end_same_day(start_time, end_time):
+            return Response({'error': 'Start and end times must be the same day'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # round start and end time to nearest 30 minute
+        start_time = round_time(start_time)
+        end_time = round_time(end_time)
+
+        # split into 30 minute increments
+        increments = split_into_increments(start_time, end_time)
+
+        # validation: check event_id
+        try:
+            event = Event.objects.get(pk=event_id)
+        except:
+            return Response({'error': f'Event does not exist with id {event_id}'}, status=status.HTTP_404_NOT_FOUND)
+
+
+        for increment in increments:
+            availability = Availability.objects.filter(event_id=event_id).filter(start_time=increment[0], end_time=increment[1], person_id=user.pk)
+            if len(availability) > 0:
+                print(availability)
+                availability.delete()
+        
+        return Response({'message': 'Availabilities deleted successfully'}, status=status.HTTP_201_CREATED)
+        
+        
 

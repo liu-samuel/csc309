@@ -131,3 +131,9 @@ def split_into_increments(start_time, end_time):
                 split_list.append([start, mid])
 
     return split_list
+
+class OverlapException(Exception):
+    def __init__(self, message):            
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+        
