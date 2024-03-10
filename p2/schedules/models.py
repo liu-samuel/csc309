@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import get_user_model
 
 class Event(models.Model):
     owner = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="owner")
