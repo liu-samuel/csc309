@@ -22,6 +22,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
 
 class ContactRequestSerializer(serializers.ModelSerializer):
+    from_user_email = serializers.EmailField(source='from_user.email', read_only=True)
+    to_user_email = serializers.EmailField(source='to_user.email', read_only=True)
     class Meta:
         model = ContactRequest
-        fields = '__all__'
+        fields = ['id', 'from_user', 'from_user_email', 'to_user', 'to_user_email', 'timestamp']
