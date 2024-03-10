@@ -4,9 +4,80 @@ from rest_framework import status, generics, permissions
 from django.contrib.auth import get_user_model
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 
 from .models import ContactRequest
-from .serializers import ContactRequestSerializer
+from .serializers import ContactRequestSerializer, UserRegistrationSerializer
+
+User = get_user_model()
+
+class UserRegistrationAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({
+                "user": UserRegistrationSerializer(user).data,
+                "message": "User created successfully"
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class ContactsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        to_user = request.user
+        from_user_email = request.data.get('email')
+        if not from_user_email:
+            return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if from_user_email == to_user.email:
+            return Response({'error': "Can't add yourself as a contact"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Find a contact request where the user who is "accepting" the request is the to_user
+        contact_request = ContactRequest.objects.filter(to_user__email=to_user.email).first()
+        if not contact_request:
+            return Response({'error': "Could not find contact request between two specified users"}, status=status.HTTP_400_BAD_REQUEST)
+        if contact_request.to_user != request.user:
+            return Response({'error': "Only the requested user can accept this contact request"}, status=status.HTTP_400_BAD_REQUEST)
+
+        from_user = contact_request.from_user
+        
+        # Add the from_user to the to_user's friend list
+        request.user.friends.add(contact_request.from_user)
+        # Add the to_user to the from_user's friend list
+        from_user.friends.add(contact_request.to_user)
+
+        # Delete the contact request
+        contact_request.delete()
+
+        return Response({'message': 'Contact added successfully'}, status=status.HTTP_201_CREATED)
+
+    def get(self, request):
+        # Get all contacts for the user
+        contacts = request.user.friends.all()
+        contacts_data = [{'email': user.email, 'name': user.get_full_name()} for user in contacts]
+        return Response(contacts_data, status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        # Remove a contact from both users' contact lists
+        email = request.query_params.get('email')
+        if not email:
+            return Response({'error': 'Email query parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if email == request.user.email:
+            return Response({'error': "Can't remove yourself as a contact"}, status=status.HTTP_400_BAD_REQUEST)
+
+        
+        try:
+            contact_user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Remove from both sides
+        request.user.friends.remove(contact_user)
+        contact_user.friends.remove(request.user)
+        return Response({'message': 'Contact removed successfully'}, status=status.HTTP_200_OK)
 
 
 class ContactRequestAPIView(generics.CreateAPIView):
