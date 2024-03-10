@@ -6,6 +6,9 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from .models import Event, Availability
+from .serializers import EventSerializer, AvailabilitySerializer
+
 
 class SuggestionAPIView(APIView):
     queryset = Event.objects.all()
@@ -28,6 +31,6 @@ class SuggestionAPIView(APIView):
 
         for a1 in owner_availabilities:
             for a2 in invitee_availabilities: 
-                if (a1.start_time <= a2.start_time and a1.start_time >= a2.end_time):
+                if (a1.end_time > a2.start_time or a1.start_time >= a2.start_time):
                     overlapping_times.append(a2)
         return overlapping_times
