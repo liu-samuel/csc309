@@ -5,7 +5,11 @@ from .models import ContactRequest
 User = get_user_model()
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    username = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    password = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = User
@@ -22,6 +26,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
 
 class ContactRequestSerializer(serializers.ModelSerializer):
+    from_user_email = serializers.EmailField(source='from_user.email', read_only=True)
+    to_user_email = serializers.EmailField(source='to_user.email', read_only=True)
     class Meta:
         model = ContactRequest
-        fields = '__all__'
+        fields = ['id', 'from_user', 'from_user_email', 'to_user', 'to_user_email', 'timestamp']

@@ -13,7 +13,7 @@ from .serializers import ContactRequestSerializer, UserRegistrationSerializer
 User = get_user_model()
 
 class UserRegistrationAPIView(APIView):
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -45,9 +45,9 @@ class ContactsAPIView(APIView):
         from_user = contact_request.from_user
         
         # Add the from_user to the to_user's friend list
-        request.user.friends.add(contact_request.from_user)
+        request.user.contacts.add(contact_request.from_user)
         # Add the to_user to the from_user's friend list
-        from_user.friends.add(contact_request.to_user)
+        from_user.contacts.add(contact_request.to_user)
 
         # Delete the contact request
         contact_request.delete()
@@ -83,12 +83,24 @@ class ContactsAPIView(APIView):
 class ContactRequestAPIView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    def get(self, request):
+        current_user = request.user
+        contact_requests = ContactRequest.objects.filter(to_user=current_user)
+        serializer = ContactRequestSerializer(contact_requests, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+
     def create(self, request):
         current_user = request.user
-        email = request.query_params.get('email')
+        contacts = request.user.friends.all()
+        contacts_emails = [user.email for user in contacts]
+        email = request.data.get('email')
+
+        if email in contacts_emails:
+            return Response({'error': 'You are already friends with this user'}, status=status.HTTP_400_BAD_REQUEST)
 
         if current_user.email == email:
-            return Response({'error': 'Can\'t send request to yourself'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Can\'t send request to yourself'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             target_user = get_user_model().objects.get(email=email)
