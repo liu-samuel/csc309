@@ -24,4 +24,4 @@ class Availability(models.Model):
     start_time = models.DateTimeField(null=False)
     end_time = models.DateTimeField(null=False)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='requests_sent')
-    type = models.CharField(choices=AvailabilityType, default=AvailabilityType.AVAILABLE, max_length=9)
+    type = models.CharField(choices=AvailabilityType.choices, default=AvailabilityType.AVAILABLE, max_length=9)
