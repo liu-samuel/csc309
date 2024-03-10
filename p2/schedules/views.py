@@ -8,7 +8,7 @@ from django.db import transaction
 
 from .models import Event, Availability
 from .serializers import EventSerializer, AvailabilitySerializer
-from .utils import time_orders_valid, start_end_same_day, round_time, split_into_increments, OverlapException
+from .utils import time_orders_valid, start_end_same_day, round_time, split_into_increments, OverlapException, is_valid_datetime_string
 
 import json
 
@@ -47,9 +47,9 @@ class EventAPIView(generics.CreateAPIView):
         except:
             return Response({'error': f'Event does not exist with id {event_id}'}, status=status.HTTP_404_NOT_FOUND)
         
-        is_finalized = request.POST.get("is_finalized")
-        name = request.POST.get("name")
-        selected_time = request.POST.get("selected_time")
+        is_finalized = request.data.get("is_finalized")
+        name = request.data.get("name")
+        selected_time = request.data.get("selected_time")
 
         # if any of these were not passed in, don't update that value
         if is_finalized != None:
@@ -57,6 +57,10 @@ class EventAPIView(generics.CreateAPIView):
         if name != None:
             event.name = name
         if selected_time != None:
+            # validation: make sure start time is of format YYYY-MM-DDThh:mm
+            if not is_valid_datetime_string(selected_time):
+                return Response({'error': 'selected_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
+
             event.selected_time = selected_time
 
         event.save()
@@ -91,13 +95,22 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
         event_id = kwargs["event_id"]
 
         try:
-            user_email = request.POST.get('email')
-            start_time = request.POST.get('start_time')
-            end_time = request.POST.get('end_time')
-            availability_type = request.POST.get('type')
+            user_email = request.data.get('email')
+            start_time = request.data.get('start_time')
+            end_time = request.data.get('end_time')
+            availability_type = request.data.get('type')
         except Exception as e:
             print(e)
             return Response({'error': 'Missing parameter(s); email, start_time, end_time or type'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # validation: make sure start time is of format YYYY-MM-DDThh:mm
+        if not is_valid_datetime_string(start_time):
+            return Response({'error': 'start_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # validation: make sure end time is of format YYYY-MM-DDThh:mm
+        if not is_valid_datetime_string(start_time):
+            return Response({'error': 'end_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
+
 
         try:
             user = get_user_model().objects.get(email=user_email)
@@ -169,12 +182,20 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
         event_id = kwargs["event_id"]
 
         try:
-            user_email = request.POST.get('email')
-            start_time = request.POST.get('start_time')
-            end_time = request.POST.get('end_time')
-            availability_type = request.POST.get('type')
+            user_email = request.data.get('email')
+            start_time = request.data.get('start_time')
+            end_time = request.data.get('end_time')
+            availability_type = request.data.get('type')
         except Exception as e:
             return Response({'error': 'Missing parameter(s); email, start_time, end_time or type'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # validation: make sure start time is of format YYYY-MM-DDThh:mm
+        if not is_valid_datetime_string(start_time):
+            return Response({'error': 'start_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # validation: make sure end time is of format YYYY-MM-DDThh:mm
+        if not is_valid_datetime_string(start_time):
+            return Response({'error': 'end_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user = get_user_model().objects.get(email=user_email)
@@ -237,12 +258,20 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
         event_id = kwargs["event_id"]
 
         try:
-            user_email = request.POST.get('email')
-            start_time = request.POST.get('start_time')
-            end_time = request.POST.get('end_time')
+            user_email = request.data.get('email')
+            start_time = request.data.get('start_time')
+            end_time = request.data.get('end_time')
         except Exception as e:
             print(e)
             return Response({'error': 'Missing parameter(s); email, start_time, end_time or type'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # validation: make sure start time is of format YYYY-MM-DDThh:mm
+        if not is_valid_datetime_string(start_time):
+            return Response({'error': 'start_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # validation: make sure end time is of format YYYY-MM-DDThh:mm
+        if not is_valid_datetime_string(start_time):
+            return Response({'error': 'end_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user = get_user_model().objects.get(email=user_email)

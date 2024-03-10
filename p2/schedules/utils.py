@@ -1,5 +1,10 @@
 import datetime
 
+class OverlapException(Exception):
+    def __init__(self, message):            
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
 """
 Rounds time to the nearest 30 minutes
 @pre time is of the format YYYY-MM-DDThh:mm
@@ -132,8 +137,12 @@ def split_into_increments(start_time, end_time):
 
     return split_list
 
-class OverlapException(Exception):
-    def __init__(self, message):            
-        # Call the base class constructor with the parameters it needs
-        super().__init__(message)
-        
+"""
+Checks if a string is a valid datetime string of the format YYYY-MM-DDThh:mm
+"""
+def is_valid_datetime_string(time):
+    try:
+        formatted = datetime.datetime.strptime(time, "%Y-%m-%dT%H:%M")
+    except:
+        return False
+    return True
