@@ -13,7 +13,7 @@ from .serializers import ContactRequestSerializer, UserRegistrationSerializer
 User = get_user_model()
 
 class UserRegistrationAPIView(APIView):
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -45,9 +45,9 @@ class ContactsAPIView(APIView):
         from_user = contact_request.from_user
         
         # Add the from_user to the to_user's friend list
-        request.user.friends.add(contact_request.from_user)
+        request.user.contacts.add(contact_request.from_user)
         # Add the to_user to the from_user's friend list
-        from_user.friends.add(contact_request.to_user)
+        from_user.contacts.add(contact_request.to_user)
 
         # Delete the contact request
         contact_request.delete()
