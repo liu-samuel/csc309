@@ -23,6 +23,11 @@ class EventAPIView(generics.CreateAPIView):
         except:
             return Response({'error': f'Event does not exist with id {event_id}'}, status=status.HTTP_404_NOT_FOUND)
 
+        # validation: check if the current user is either owner or invitee. if not, they are forbidden
+        logged_in_user = request.user
+        if logged_in_user.id != event.owner.id and logged_in_user.id != event.invitee.id:
+            return Response({'error': 'You are not allowed to view this event'}, status=status.HTTP_403_FORBIDDEN)
+
         try:
             all_availabilities = Availability.objects.filter(event__pk=event_id)
         except:
@@ -47,6 +52,11 @@ class EventAPIView(generics.CreateAPIView):
         except:
             return Response({'error': f'Event does not exist with id {event_id}'}, status=status.HTTP_404_NOT_FOUND)
         
+        # validation: check if the current user is either owner or invitee. if not, they are forbidden
+        logged_in_user = request.user
+        if logged_in_user.id != event.owner.id and logged_in_user.id != event.invitee.id:
+            return Response({'error': 'You are not allowed to update this event'}, status=status.HTTP_403_FORBIDDEN)
+
         is_finalized = request.data.get("is_finalized")
         name = request.data.get("name")
         selected_time = request.data.get("selected_time")
@@ -76,6 +86,11 @@ class EventAPIView(generics.CreateAPIView):
         except:
             return Response({'error': f'Event does not exist with id {event_id}'}, status=status.HTTP_404_NOT_FOUND)
         
+        # validation: check if the current user is either owner or invitee. if not, they are forbidden
+        logged_in_user = request.user
+        if logged_in_user.id != event.owner.id and logged_in_user.id != event.invitee.id:
+            return Response({'error': 'You are not allowed to delete this event'}, status=status.HTTP_403_FORBIDDEN)
+
         event.delete()
         return Response({'message': 'Event deleted successfully'}, status=status.HTTP_200_OK)
         
@@ -152,6 +167,11 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
             event = Event.objects.get(pk=event_id)
         except:
             return Response({'error': f'Event does not exist with id {event_id}'}, status=status.HTTP_404_NOT_FOUND)
+
+        # validation: check if the current user is either owner or invitee. if not, they are forbidden
+        logged_in_user = request.user
+        if logged_in_user.id != event.owner.id and logged_in_user.id != event.invitee.id:
+            return Response({'error': 'You are not allowed to add availability to this event'}, status=status.HTTP_403_FORBIDDEN)
 
 
         creation_data = []
@@ -252,6 +272,11 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
             return Response({'error': f'Event does not exist with id {event_id}'}, status=status.HTTP_404_NOT_FOUND)
 
 
+        # validation: check if the current user is either owner or invitee. if not, they are forbidden
+        logged_in_user = request.user
+        if logged_in_user.id != event.owner.id and logged_in_user.id != event.invitee.id:
+            return Response({'error': 'You are not allowed to update availability for this event'}, status=status.HTTP_403_FORBIDDEN)
+
         update_data = []
 
         # validation: check for start/end time overlap
@@ -337,6 +362,11 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
             event = Event.objects.get(pk=event_id)
         except:
             return Response({'error': f'Event does not exist with id {event_id}'}, status=status.HTTP_404_NOT_FOUND)
+
+        # validation: check if the current user is either owner or invitee. if not, they are forbidden
+        logged_in_user = request.user
+        if logged_in_user.id != event.owner.id and logged_in_user.id != event.invitee.id:
+            return Response({'error': 'You are not allowed to delete availability for this event'}, status=status.HTTP_403_FORBIDDEN)
 
 
         for increment in increments:

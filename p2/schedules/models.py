@@ -1,10 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import get_user_model
 
 class Event(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="owner")
-    invitee = models.ForeignKey(User, on_delete=models.CASCADE, related_name="invitee")
+    owner = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="owner")
+    invitee = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="invitee")
     deadline = models.DateTimeField()
     name = models.CharField(max_length=50, blank=True)
     is_finalized = models.BooleanField()
@@ -20,7 +21,7 @@ class Availability(models.Model):
         PREFERRED = "preferred", _("preferred")
         AVAILABLE = "available", _("available")
 
-    person = models.ForeignKey(User, on_delete=models.CASCADE, related_name='person')
+    person = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='person')
     start_time = models.DateTimeField(null=False)
     end_time = models.DateTimeField(null=False)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='requests_sent')
