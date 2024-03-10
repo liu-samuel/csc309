@@ -103,6 +103,19 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
             print(e)
             return Response({'error': 'Missing parameter(s); email, start_time, end_time or type'}, status=status.HTTP_400_BAD_REQUEST)
 
+        param_error = []
+        if (user_email == None):
+            param_error.append("email")
+        if (start_time == None):
+            param_error.append("start_time")
+        if (end_time == None):
+            param_error.append("end_time")
+        if (availability_type == None):
+            param_error.append("type")
+
+        if len(param_error) > 0:
+            return Response({'error': f'Missing parameter(s): {", ".join(param_error)}'}, status=status.HTTP_400_BAD_REQUEST)
+
         # validation: make sure start time is of format YYYY-MM-DDThh:mm
         if not is_valid_datetime_string(start_time):
             return Response({'error': 'start_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
@@ -189,6 +202,19 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
         except Exception as e:
             return Response({'error': 'Missing parameter(s); email, start_time, end_time or type'}, status=status.HTTP_400_BAD_REQUEST)
 
+        param_error = []
+        if (user_email == None):
+            param_error.append("email")
+        if (start_time == None):
+            param_error.append("start_time")
+        if (end_time == None):
+            param_error.append("end_time")
+        if (availability_type == None):
+            param_error.append("type")
+
+        if len(param_error) > 0:
+            return Response({'error': f'Missing parameter(s): {", ".join(param_error)}'}, status=status.HTTP_400_BAD_REQUEST)
+
         # validation: make sure start time is of format YYYY-MM-DDThh:mm
         if not is_valid_datetime_string(start_time):
             return Response({'error': 'start_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
@@ -264,6 +290,17 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
         except Exception as e:
             print(e)
             return Response({'error': 'Missing parameter(s); email, start_time, end_time or type'}, status=status.HTTP_400_BAD_REQUEST)
+
+        param_error = []
+        if (user_email == None):
+            param_error.append("email")
+        if (start_time == None):
+            param_error.append("start_time")
+        if (end_time == None):
+            param_error.append("end_time")
+
+        if len(param_error) > 0:
+            return Response({'error': f'Missing parameter(s): {", ".join(param_error)}'}, status=status.HTTP_400_BAD_REQUEST)
 
         # validation: make sure start time is of format YYYY-MM-DDThh:mm
         if not is_valid_datetime_string(start_time):
