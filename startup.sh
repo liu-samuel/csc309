@@ -22,7 +22,7 @@ source "$venv_name"/bin/activate
 
 # Install required Python packages
 echo "Installing required Python packages"
-pip install django pillow djangorestframework djangorestframework-simplejwt
+pip install django pillow djangorestframework djangorestframework-simplejwt drf-yasg
 
 cd p2
 

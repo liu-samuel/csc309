@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import EventAPIView, EventAvailabilityAPIView, SuggestionAPIView
+from .views import EventAPIView, EventAvailabilityAPIView, EventsListAPIView, SuggestionAPIView
 
 app_name = 'schedules'
 
