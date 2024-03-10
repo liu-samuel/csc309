@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 
@@ -39,21 +39,21 @@ class EventsListAPIView(generics.ListCreateAPIView):
 
 
     def post(self, request, **kwargs):
-        owner = request.POST.get("owner")
-        invitee = request.POST.get("invitee")
-        deadline = request.POST.get("deadline")
-        name = request.POST.get("name")
+        owner = request.data.get("owner")
+        invitee = request.data.get("invitee")
+        deadline = request.data.get("deadline")
+        name = request.data.get("name")
         is_finalized = False
         selected_time = None
         
         # validations
         try:
-            owner_user = User.objects.get(pk=owner)
-            invitee_user = User.objects.get(pk=invitee)
+            owner_user = get_user_model().objects.get(pk=owner)
+            invitee_user = get_user_model().objects.get(pk=invitee)
 
             if not name: # necessary due to serializer
                 name = f'{owner_user.first_name} / {invitee_user.first_name}'
-        except User.DoesNotExist:
+        except get_user_model().DoesNotExist:
             return Response({'error': 'User(s) not found'}, status=status.HTTP_404_NOT_FOUND)
         
         event_data = {
