@@ -126,7 +126,7 @@ def send_request_email(owner, invitee, event):
     owner_email = owner.email
     invitee_email = invitee.email
     subject = f"{owner.email} has invited you to input availability for '{event.name}'"
-    body = f"add link here"
+    body = f"Please input your availability"
 
     send_email(owner_email, [invitee_email], subject, body)
 
