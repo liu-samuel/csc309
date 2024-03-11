@@ -2,10 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions
 from django.contrib.auth import get_user_model
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 
 from .models import ContactRequest
 from .serializers import ContactRequestSerializer, UserRegistrationSerializer
@@ -14,9 +11,15 @@ User = get_user_model()
 
 class UserRegistrationAPIView(APIView):
     def post(self, request):
-        # TODO: Make sure the user doesn't already exist with that username or email
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
+            # Check for existing user with the same username or email
+            username = serializer.validated_data.get('username')
+            email = serializer.validated_data.get('email')
+            if User.objects.filter(username=username).exists():
+                return Response({'error': 'A user with that username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+            if User.objects.filter(email=email).exists():
+                return Response({'error': 'A user with that email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
             user = serializer.save()
             return Response({
                 "user": UserRegistrationSerializer(user).data,
@@ -57,7 +60,7 @@ class ContactsAPIView(APIView):
 
     def get(self, request):
         # Get all contacts for the user
-        contacts = request.user.friends.all()
+        contacts = request.user.contacts.all()
         contacts_data = [{'email': user.email, 'name': user.get_full_name()} for user in contacts]
         return Response(contacts_data, status=status.HTTP_200_OK)
 
@@ -93,12 +96,15 @@ class ContactRequestAPIView(generics.CreateAPIView):
 
     def create(self, request):
         current_user = request.user
-        contacts = request.user.friends.all()
+        contacts = request.user.contacts.all()
         contacts_emails = [user.email for user in contacts]
         email = request.data.get('email')
 
+        if not email:
+            return Response({'error': 'Field "email" is required'}, status=status.HTTP_400_BAD_REQUEST)
+
         if email in contacts_emails:
-            return Response({'error': 'You are already friends with this user'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'You are already contacts with this user'}, status=status.HTTP_400_BAD_REQUEST)
 
         if current_user.email == email:
             return Response({'error': 'Can\'t send request to yourself'}, status=status.HTTP_400_BAD_REQUEST)
