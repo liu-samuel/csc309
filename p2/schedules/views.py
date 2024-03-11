@@ -18,6 +18,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from .models import Event, Availability
 from .serializers import EventSerializer, AvailabilitySerializer
+from django.core.exceptions import ValidationError
 
 class EventsListAPIView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -38,15 +39,15 @@ class EventsListAPIView(generics.ListCreateAPIView):
         if not is_finalized:
             missing_params.append('is_finalized')
         if len(missing_params) > 0:
-            return Response({'error': f"Missing required parameters {', '.join(missing_params)}"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': f"Missing required parameter(s): {', '.join(missing_params)}"}, status=status.HTTP_400_BAD_REQUEST)
         
-        missing_params = []
+        num_params = []
         if not owner.isnumeric():
-            missing_params.append('owner')
+            num_params.append('owner')
         if not invitee.isnumeric():
-            missing_params.append('invitee')
-        if len(missing_params) > 0:
-            return Response({'error': f"Parameters must be a number: {', '.join(missing_params)}"}, status=status.HTTP_400_BAD_REQUEST)
+            num_params.append('invitee')
+        if len(num_params) > 0:
+            return Response({'error': f"Parameter(s) must be a number: {', '.join(num_params)}"}, status=status.HTTP_400_BAD_REQUEST)
 
 
         # check that the current user is either the owner or the invitee
@@ -63,6 +64,8 @@ class EventsListAPIView(generics.ListCreateAPIView):
                 is_finalized = False
             elif is_finalized.lower() == "true":
                 is_finalized = True
+            else:
+                return Response({'error': 'is_finalized must be a boolean value'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             events = Event.objects.filter(owner__pk=owner, invitee__pk=invitee, is_finalized=bool(is_finalized))
@@ -93,7 +96,15 @@ class EventsListAPIView(generics.ListCreateAPIView):
         if not deadline:
             missing_params.append('deadline')
         if len(missing_params) > 0:
-            return Response({'error': f"Missing required parameters {(', ').join(missing_params)}"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': f"Missing required parameter(s): {(', ').join(missing_params)}"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # check that invitee is a number
+        if not invitee.isnumeric():
+            return Response({'error': "invitee ID must be a number"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # check that deadline is a valid date time string
+        if not is_valid_datetime_string(deadline):
+            return Response({'error': "deadline must be a valid DateTime string"}, status=status.HTTP_400_BAD_REQUEST)
         
         # check that the two users are different
         if owner.pk == invitee:
@@ -201,11 +212,13 @@ class EventAPIView(generics.CreateAPIView):
                 return Response({'error': 'selected_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
 
             event.selected_time = selected_time
+        try:
+            event.save()
 
-        event.save()
-
-        serializer = EventSerializer(event)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer = EventSerializer(event)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ValidationError as e:
+            return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, **kwargs):
         event_id = kwargs["event_id"]
@@ -259,12 +272,15 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
         if len(param_error) > 0:
             return Response({'error': f'Missing parameter(s): {", ".join(param_error)}'}, status=status.HTTP_400_BAD_REQUEST)
 
+        if (availability_type != "available" and availability_type != "preferred"):
+            return Response({'error': "type must be either 'available' or 'preferred'"}, status=status.HTTP_400_BAD_REQUEST)
+
         # validation: make sure start time is of format YYYY-MM-DDThh:mm
         if not is_valid_datetime_string(start_time):
             return Response({'error': 'start_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
 
         # validation: make sure end time is of format YYYY-MM-DDThh:mm
-        if not is_valid_datetime_string(start_time):
+        if not is_valid_datetime_string(end_time):
             return Response({'error': 'end_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -325,13 +341,13 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
                         serializer.save()
                         creation_data.append(serializer.data)
                     else:
-                        raise Exception(serializer.errors)
+                        raise ValidationError(serializer.errors)
                 
                 return Response(creation_data, status=status.HTTP_201_CREATED)
         except OverlapException as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response(json.dumps(str(e)), status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
+            return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
 
 
     """
@@ -363,12 +379,15 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
         if len(param_error) > 0:
             return Response({'error': f'Missing parameter(s): {", ".join(param_error)}'}, status=status.HTTP_400_BAD_REQUEST)
 
+        if (availability_type != "available" and availability_type != "preferred"):
+            return Response({'error': "type must be either 'available' or 'preferred'"}, status=status.HTTP_400_BAD_REQUEST)
+
         # validation: make sure start time is of format YYYY-MM-DDThh:mm
         if not is_valid_datetime_string(start_time):
             return Response({'error': 'start_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
 
         # validation: make sure end time is of format YYYY-MM-DDThh:mm
-        if not is_valid_datetime_string(start_time):
+        if not is_valid_datetime_string(end_time):
             return Response({'error': 'end_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -426,8 +445,8 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
                 return Response(update_data, status=status.HTTP_201_CREATED)
         except OverlapException as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response(json.dumps(str(e)), status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
+            return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
 
     """
     Delete all availabilities between start_time and end_time (assuming they're on the same date).
@@ -459,7 +478,7 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
             return Response({'error': 'start_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
 
         # validation: make sure end time is of format YYYY-MM-DDThh:mm
-        if not is_valid_datetime_string(start_time):
+        if not is_valid_datetime_string(end_time):
             return Response({'error': 'end_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
