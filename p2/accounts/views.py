@@ -100,6 +100,9 @@ class ContactRequestAPIView(generics.CreateAPIView):
         contacts_emails = [user.email for user in contacts]
         email = request.data.get('email')
 
+        if not email:
+            return Response({'error': 'Field "email" is required'}, status=status.HTTP_400_BAD_REQUEST)
+
         if email in contacts_emails:
             return Response({'error': 'You are already contacts with this user'}, status=status.HTTP_400_BAD_REQUEST)
 
