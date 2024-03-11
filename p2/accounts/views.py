@@ -14,6 +14,7 @@ User = get_user_model()
 
 class UserRegistrationAPIView(APIView):
     def post(self, request):
+        # TODO: Make sure the user doesn't already exist with that username or email
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -75,8 +76,8 @@ class ContactsAPIView(APIView):
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         
         # Remove from both sides
-        request.user.friends.remove(contact_user)
-        contact_user.friends.remove(request.user)
+        request.user.contacts.remove(contact_user)
+        contact_user.contacts.remove(request.user)
         return Response({'message': 'Contact removed successfully'}, status=status.HTTP_200_OK)
 
 
