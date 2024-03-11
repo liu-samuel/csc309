@@ -244,7 +244,6 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
             end_time = request.data.get('end_time')
             availability_type = request.data.get('type')
         except Exception as e:
-            print(e)
             return Response({'error': 'Missing parameter(s); email, start_time, end_time or type'}, status=status.HTTP_400_BAD_REQUEST)
 
         param_error = []
@@ -442,7 +441,6 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
             start_time = request.data.get('start_time')
             end_time = request.data.get('end_time')
         except Exception as e:
-            print(e)
             return Response({'error': 'Missing parameter(s); email, start_time, end_time or type'}, status=status.HTTP_400_BAD_REQUEST)
 
         param_error = []
@@ -501,7 +499,6 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
         for increment in increments:
             availability = Availability.objects.filter(event_id=event_id).filter(start_time=increment[0], end_time=increment[1], person_id=user.pk)
             if len(availability) > 0:
-                print(availability)
                 availability.delete()
         
         return Response({'message': 'Availabilities deleted successfully'}, status=status.HTTP_200_OK)
