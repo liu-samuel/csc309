@@ -496,9 +496,10 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
                 availability.delete()
         
         return Response({'message': 'Availabilities deleted successfully'}, status=status.HTTP_201_CREATED)
-
+    
 
 class SuggestionAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
     queryset = Event.objects.all()
     serializer_class = EventSerializer
 
