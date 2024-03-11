@@ -93,7 +93,7 @@ class EventsListAPIView(generics.ListCreateAPIView):
         if not deadline:
             missing_params.append('deadline')
         if len(missing_params) > 0:
-            return Response({'error': f"Missing required parameters {missing_params.join(', ')}"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': f"Missing required parameters {(', ').join(missing_params)}"}, status=status.HTTP_400_BAD_REQUEST)
         
         # check that the two users are different
         if owner.pk == invitee:
