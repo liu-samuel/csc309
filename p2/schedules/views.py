@@ -18,6 +18,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from .models import Event, Availability
 from .serializers import EventSerializer, AvailabilitySerializer
+from django.core.exceptions import ValidationError
 
 class EventsListAPIView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -201,11 +202,13 @@ class EventAPIView(generics.CreateAPIView):
                 return Response({'error': 'selected_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
 
             event.selected_time = selected_time
+        try:
+            event.save()
 
-        event.save()
-
-        serializer = EventSerializer(event)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer = EventSerializer(event)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ValidationError as e:
+            return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, **kwargs):
         event_id = kwargs["event_id"]
