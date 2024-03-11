@@ -6,8 +6,8 @@ from django.contrib.auth import get_user_model
 
 
 class CustomUser(AbstractUser):
-    contacts = models.ManyToManyField('self', blank=True, symmetrical=True, related_name='my_friends')
-    # TODO: make email unique
+    email = models.EmailField(_('email address'), unique=True)
+    contacts = models.ManyToManyField('self', blank=True, symmetrical=True)
 
     def __str__(self):
         return self.email
