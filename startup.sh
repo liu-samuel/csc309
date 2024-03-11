@@ -2,6 +2,14 @@
 
 venv_name="csc309_p2"
 
+if ! command -v python3 &> /dev/null; then
+    echo "Installing Python 3..."
+    sudo apt-get update
+    sudo apt-get install -y python3
+else
+    echo "Python 3 is already installed."
+fi
+
 # Check if virtualenv is installed, if not, install it
 if ! command -v virtualenv &> /dev/null
 then
