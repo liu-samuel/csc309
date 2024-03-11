@@ -67,11 +67,11 @@ class EventsListAPIView(generics.ListCreateAPIView):
         try:
             events = Event.objects.filter(owner__pk=owner, invitee__pk=invitee, is_finalized=bool(is_finalized))
         except Exception:
-            return Response({'error': 'Cannot get availabilities for event'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Cannot get events'}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            events_response = serializers.serialize('json', events)
-            return Response(json.loads(events_response), status=status.HTTP_200_OK)
+            events_response = [EventSerializer(event).data for event in events]
+            return Response({'events': events_response}, status=status.HTTP_200_OK)
         except Exception:
             return Response({'error': 'Serialization error'}, status=status.HTTP_400_BAD_REQUEST)
 
