@@ -38,15 +38,15 @@ class EventsListAPIView(generics.ListCreateAPIView):
         if not is_finalized:
             missing_params.append('is_finalized')
         if len(missing_params) > 0:
-            return Response({'error': f"Missing required parameters {', '.join(missing_params)}"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': f"Missing required parameter(s): {', '.join(missing_params)}"}, status=status.HTTP_400_BAD_REQUEST)
         
-        missing_params = []
+        num_params = []
         if not owner.isnumeric():
-            missing_params.append('owner')
+            num_params.append('owner')
         if not invitee.isnumeric():
-            missing_params.append('invitee')
-        if len(missing_params) > 0:
-            return Response({'error': f"Parameters must be a number: {', '.join(missing_params)}"}, status=status.HTTP_400_BAD_REQUEST)
+            num_params.append('invitee')
+        if len(num_params) > 0:
+            return Response({'error': f"Parameter(s) must be a number: {', '.join(num_params)}"}, status=status.HTTP_400_BAD_REQUEST)
 
 
         # check that the current user is either the owner or the invitee
@@ -63,6 +63,8 @@ class EventsListAPIView(generics.ListCreateAPIView):
                 is_finalized = False
             elif is_finalized.lower() == "true":
                 is_finalized = True
+            else:
+                return Response({'error': 'is_finalized must be a boolean value'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             events = Event.objects.filter(owner__pk=owner, invitee__pk=invitee, is_finalized=bool(is_finalized))
@@ -93,7 +95,15 @@ class EventsListAPIView(generics.ListCreateAPIView):
         if not deadline:
             missing_params.append('deadline')
         if len(missing_params) > 0:
-            return Response({'error': f"Missing required parameters {(', ').join(missing_params)}"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': f"Missing required parameter(s): {(', ').join(missing_params)}"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # check that invitee is a number
+        if not invitee.isnumeric():
+            return Response({'error': "invitee ID must be a number"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # check that deadline is a valid date time string
+        if not is_valid_datetime_string(deadline):
+            return Response({'error': "deadline must be a valid DateTime string"}, status=status.HTTP_400_BAD_REQUEST)
         
         # check that the two users are different
         if owner.pk == invitee:
