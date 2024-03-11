@@ -38,11 +38,20 @@ class EventsListAPIView(generics.ListCreateAPIView):
         if not is_finalized:
             missing_params.append('is_finalized')
         if len(missing_params) > 0:
-            return Response({'error': f"Missing required parameters {missing_params.join(', ')}"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': f"Missing required parameters {', '.join(missing_params)}"}, status=status.HTTP_400_BAD_REQUEST)
         
+        missing_params = []
+        if not owner.isnumeric():
+            missing_params.append('owner')
+        if not invitee.isnumeric():
+            missing_params.append('invitee')
+        if len(missing_params) > 0:
+            return Response({'error': f"Parameters must be a number: {', '.join(missing_params)}"}, status=status.HTTP_400_BAD_REQUEST)
+
+
         # check that the current user is either the owner or the invitee
         current_user = request.user
-        if (current_user.pk != owner) and (current_user.pk != invitee):
+        if (current_user.pk != int(owner)) and (current_user.pk != int(invitee)):
             return Response({'error': 'Forbidden'}, status=status.HTTP_403_FORBIDDEN)
         
         # check that owner and invitee are different
@@ -100,7 +109,7 @@ class EventsListAPIView(generics.ListCreateAPIView):
             return Response({'error': 'User(s) not found'}, status=status.HTTP_404_NOT_FOUND)
         
         # check that the owner and invitee are contacts
-        if invitee_user not in owner.friends.all():
+        if invitee_user not in owner.contacts.all():
             return Response({'error': 'Must be contacts to create an event invitation'}, status=status.HTTP_403_FORBIDDEN)
         
         event_data = {
