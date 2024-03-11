@@ -99,6 +99,7 @@ class ContactRequestAPIView(generics.CreateAPIView):
         contacts = request.user.contacts.all()
         contacts_emails = [user.email for user in contacts]
         email = request.data.get('email')
+        to_user = request.data.get
 
         if not email:
             return Response({'error': 'Field "email" is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -117,6 +118,10 @@ class ContactRequestAPIView(generics.CreateAPIView):
         existing_request = ContactRequest.objects.filter(from_user=current_user, to_user=target_user).first()
         if existing_request:
             return Response({'message': 'ContactRequest already exists'}, status=status.HTTP_200_OK)
+        
+        existing_incoming_request = ContactRequest.objects.filter(from_user=target_user, to_user=current_user).first()
+        if existing_incoming_request:
+            return Response({'message': 'Incoming ContactRequest already exists'}, status=status.HTTP_200_OK)
         
         contact_request_data = {
             'from_user': current_user.id,
