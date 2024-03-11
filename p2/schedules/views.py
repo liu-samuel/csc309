@@ -100,7 +100,7 @@ class EventsListAPIView(generics.ListCreateAPIView):
             return Response({'error': 'User(s) not found'}, status=status.HTTP_404_NOT_FOUND)
         
         # check that the owner and invitee are contacts
-        if invitee_user not in owner.friends.all():
+        if invitee_user not in owner.contacts.all():
             return Response({'error': 'Must be contacts to create an event invitation'}, status=status.HTTP_403_FORBIDDEN)
         
         event_data = {

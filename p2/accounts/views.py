@@ -60,7 +60,7 @@ class ContactsAPIView(APIView):
 
     def get(self, request):
         # Get all contacts for the user
-        contacts = request.user.friends.all()
+        contacts = request.user.contacts.all()
         contacts_data = [{'email': user.email, 'name': user.get_full_name()} for user in contacts]
         return Response(contacts_data, status=status.HTTP_200_OK)
 
@@ -96,12 +96,12 @@ class ContactRequestAPIView(generics.CreateAPIView):
 
     def create(self, request):
         current_user = request.user
-        contacts = request.user.friends.all()
+        contacts = request.user.contacts.all()
         contacts_emails = [user.email for user in contacts]
         email = request.data.get('email')
 
         if email in contacts_emails:
-            return Response({'error': 'You are already friends with this user'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'You are already contacts with this user'}, status=status.HTTP_400_BAD_REQUEST)
 
         if current_user.email == email:
             return Response({'error': 'Can\'t send request to yourself'}, status=status.HTTP_400_BAD_REQUEST)
