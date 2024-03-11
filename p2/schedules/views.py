@@ -262,12 +262,15 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
         if len(param_error) > 0:
             return Response({'error': f'Missing parameter(s): {", ".join(param_error)}'}, status=status.HTTP_400_BAD_REQUEST)
 
+        if (availability_type != "available" and availability_type != "preferred"):
+            return Response({'error': "type must be either 'available' or 'preferred'"}, status=status.HTTP_400_BAD_REQUEST)
+
         # validation: make sure start time is of format YYYY-MM-DDThh:mm
         if not is_valid_datetime_string(start_time):
             return Response({'error': 'start_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
 
         # validation: make sure end time is of format YYYY-MM-DDThh:mm
-        if not is_valid_datetime_string(start_time):
+        if not is_valid_datetime_string(end_time):
             return Response({'error': 'end_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -328,13 +331,13 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
                         serializer.save()
                         creation_data.append(serializer.data)
                     else:
-                        raise Exception(serializer.errors)
+                        raise ValidationError(serializer.errors)
                 
                 return Response(creation_data, status=status.HTTP_201_CREATED)
         except OverlapException as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response(json.dumps(str(e)), status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
+            return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
 
 
     """
@@ -366,12 +369,15 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
         if len(param_error) > 0:
             return Response({'error': f'Missing parameter(s): {", ".join(param_error)}'}, status=status.HTTP_400_BAD_REQUEST)
 
+        if (availability_type != "available" and availability_type != "preferred"):
+            return Response({'error': "type must be either 'available' or 'preferred'"}, status=status.HTTP_400_BAD_REQUEST)
+
         # validation: make sure start time is of format YYYY-MM-DDThh:mm
         if not is_valid_datetime_string(start_time):
             return Response({'error': 'start_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
 
         # validation: make sure end time is of format YYYY-MM-DDThh:mm
-        if not is_valid_datetime_string(start_time):
+        if not is_valid_datetime_string(end_time):
             return Response({'error': 'end_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -429,8 +435,8 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
                 return Response(update_data, status=status.HTTP_201_CREATED)
         except OverlapException as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response(json.dumps(str(e)), status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
+            return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
 
     """
     Delete all availabilities between start_time and end_time (assuming they're on the same date).
@@ -462,7 +468,7 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
             return Response({'error': 'start_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
 
         # validation: make sure end time is of format YYYY-MM-DDThh:mm
-        if not is_valid_datetime_string(start_time):
+        if not is_valid_datetime_string(end_time):
             return Response({'error': 'end_time must be of the format YYYY-MM-DDThh:mm'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
