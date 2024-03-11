@@ -504,7 +504,7 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
                 print(availability)
                 availability.delete()
         
-        return Response({'message': 'Availabilities deleted successfully'}, status=status.HTTP_201_CREATED)
+        return Response({'message': 'Availabilities deleted successfully'}, status=status.HTTP_200_OK)
     
 
 class SuggestionAPIView(APIView):
