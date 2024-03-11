@@ -10,12 +10,21 @@ else
     echo "Python 3 is already installed."
 fi
 
+if ! dpkg -s python3.8-distutils &> /dev/null; then
+    echo "Installing python3.8-distutils..."
+    sudo apt-get update
+    sudo apt-get install -y python3.8-distutils
+else
+    echo "python3.8-distutils is already installed."
+fi
+
 # Check if virtualenv is installed, if not, install it
 if ! command -v virtualenv &> /dev/null
 then
     echo "Installing virtualenv"
     pip install virtualenv
 fi
+
 
 # Create a virtual environment
 if [ ! -d "$venv_name" ]
