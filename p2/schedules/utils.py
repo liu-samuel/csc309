@@ -151,7 +151,10 @@ def split_into_increments(start_time, end_time):
         end = datetime.datetime.strptime(mid, "%Y-%m-%dT%H:%M") + datetime.timedelta(minutes=30)
         end = end.strftime("%Y-%m-%dT%H:%M")
 
-        if hour < end_hours:
+        # base case for if you start at the 30 minute mark
+        if hour == start_hours and start_minutes == 30:
+            split_list.append([mid, end])
+        elif hour < end_hours:
             split_list.append([start, mid])
             split_list.append([mid, end])
         else:
