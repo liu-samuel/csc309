@@ -545,17 +545,21 @@ class SuggestionAPIView(APIView):
         for a1 in owner_availabilities:
             for a2 in invitee_availabilities: 
                 if (a1.start_time >= a2.start_time and a1.end_time >= a2.end_time):
-                    times = {'start_time': str(a1.start_time), 'end_time': str(a2.end_time)}
-                    
+                    if a1.start_time < a2.end_time:
+                        times = {'start_time': str(a1.start_time), 'end_time': str(a2.end_time)}
+                        overlapping_times.add(tuple(times.values()))
                 elif (a2.start_time >= a1.start_time and a2.end_time >= a1.end_time):
-                    times = {'start_time': str(a2.start_time), 'end_time': str(a1.end_time)}
-
+                    if a2.start_time < a1.end_time:
+                        times = {'start_time': str(a2.start_time), 'end_time': str(a1.end_time)}
+                        overlapping_times.add(tuple(times.values()))
                 elif (a1.start_time >= a2.start_time and a1.end_time <= a2.end_time):
-                    times = {'start_time': str(a1.start_time), 'end_time': str(a1.end_time)}
-
+                    if a1.start_time < a1.end_time:
+                        times = {'start_time': str(a1.start_time), 'end_time': str(a1.end_time)}
+                        overlapping_times.add(tuple(times.values()))
                 elif (a2.start_time >= a1.start_time and a2.end_time <= a1.end_time):
-                    times = {'start_time': str(a2.start_time), 'end_time': str(a2.end_time)}
-                overlapping_times.add(tuple(times.values()))
+                    if a2.start_time < a2.end_time:
+                        times = {'start_time': str(a2.start_time), 'end_time': str(a2.end_time)}
+                        overlapping_times.add(tuple(times.values()))
 
         overlapping_times = [{'start_time': start_time, 'end_time': end_time} for start_time, end_time in overlapping_times]
         return Response(overlapping_times)
