@@ -9,6 +9,20 @@ from .serializers import ContactRequestSerializer, UserRegistrationSerializer
 
 User = get_user_model()
 
+class UserAPIView(APIView):
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(pk=user_id)
+            user_data = {
+                'id': user.id,
+                'username': user.username,
+                'name': user.get_full_name(),
+                'email': user.email,
+            }
+            return Response(user_data)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=404)
+
 class UserRegistrationAPIView(APIView):
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
@@ -117,11 +131,11 @@ class ContactRequestAPIView(generics.CreateAPIView):
         
         existing_request = ContactRequest.objects.filter(from_user=current_user, to_user=target_user).first()
         if existing_request:
-            return Response({'message': 'ContactRequest already exists'}, status=status.HTTP_200_OK)
+            return Response({'error': 'ContactRequest already exists'}, status=status.HTTP_400_BAD_REQUEST)
         
         existing_incoming_request = ContactRequest.objects.filter(from_user=target_user, to_user=current_user).first()
         if existing_incoming_request:
-            return Response({'message': 'Incoming ContactRequest already exists'}, status=status.HTTP_200_OK)
+            return Response({'error': 'Incoming ContactRequest already exists'}, status=status.HTTP_400_BAD_REQUEST)
         
         contact_request_data = {
             'from_user': current_user.id,
@@ -131,7 +145,7 @@ class ContactRequestAPIView(generics.CreateAPIView):
         serializer = ContactRequestSerializer(data=contact_request_data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({'message': "Contact Request Sent"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request):

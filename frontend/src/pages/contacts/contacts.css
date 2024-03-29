@@ -72,13 +72,13 @@ hr {
 .email {
     font-size: small;
 }
-.name, .unfriend, .add {
+.name, .unfriend, .add, .delete {
     font-size: large;
     font-weight: bold;
 }
 
 
-.unfriend, .add {
+.unfriend, .add, .delete {
     width: 100px;
     height: 50px;
     border-radius: 50px;
@@ -91,7 +91,7 @@ hr {
     align-items: center;
 }
 
-.add {
+.add, .delete {
     padding: 30px;
 }
 
@@ -145,12 +145,61 @@ hr {
     align-items: center;
 }
 
-a {
-    text-decoration: none;
+button {
+    appearance: none;
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
 }
+
 
 .wrapper-div {
     width:100%;
+}
+
+.request-message {
+    display: flex;
+    justify-content: center;
+    color: #FF5B61;
+    font-style: italic;
+}
+
+.search-container {
+    display: flex;
+    justify-content: center;
+
+}
+
+.search{
+    display: flex;
+    justify-content: center;
+    width: 50%; 
+    padding: 10px; 
+    font-size: 16px; 
+    border-radius: 5px; 
+}
+
+input {
+    display: flex;
+    justify-content: center;
+    width: 50%; 
+    padding: 10px; 
+    font-size: 16px; 
+    border-radius: 5px; 
+}
+
+.search-title {
+    display: flex;
+    justify-content: center;
+    font-size: large;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+
+.buttons {
+    display: flex;
+    margin-right: 2%;
 }
 
 .friends:hover {
@@ -168,7 +217,7 @@ a {
     background-color: #015026;
 }
 
-.unfriend:hover {
+.unfriend:hover, .delete:hover {
     background-color: #b30000;
 }
 
@@ -176,7 +225,7 @@ a {
     background-color: #4D8DC9;
 }
 
-.add:hover, .unfriend:hover {
+.add:hover, .unfriend:hover, .delete:hover {
     cursor: pointer;
 }
 
@@ -186,14 +235,14 @@ a {
         height: 50px;
         border-radius: 25px;
     }
-    .name, .unfriend, .add {
+    .name, .unfriend, .add, .delete {
         font-size: small;
         font-weight: normal;
     }
     .email {
         font-size: xx-small;
     }
-    .unfriend, .add {
+    .unfriend, .add, .delete {
         width: 70px;
         height: 37px;
         border-radius: 25px;
