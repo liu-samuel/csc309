@@ -3,6 +3,7 @@ import './NewMeeting.css'
 import axios from 'axios';
 import NavBar from '../../components/NavBar/NavBar';
 import Footer from '../../components/Footer/Footer';
+import Calendar from '../../components/Calendar/Calendar';
 import { EVENT_URL, TOKEN_URL, USER_URL } from '../../constants';
 
 const NewMeeting = () => {
@@ -77,242 +78,7 @@ const NewMeeting = () => {
         <h1 className="title">
             New Meeting With <span className="attending-name">Ron</span>
         </h1>
-        <div className="calendar">
-                  <div className="calendar-header">
-            <h2>Jan 1-4</h2>
-            <div className="calendar-color-index">
-              <div className="calendar-index-container">
-                <p>Available:</p>
-                <div
-                  className="calendar-available-box secondary-green-background"
-                ></div>
-              </div>
-              <div className="calendar-index-container">
-                <p>Preferred:</p>
-                <div
-                  className="calendar-preferred-box blue-background"
-                ></div>
-              </div>
-            </div>
-          </div>
-          <div className="calendar-container">
-            <table>
-              <thead>
-                <tr className="header">
-                  <th>
-                    <span className="day">Tuesday</span
-                    ><span className="date">Jan 1</span>
-                  </th>
-                  <th>
-                    <span className="day">Wednesday</span
-                    ><span className="date">Jan 2</span>
-                  </th>
-                  <th>
-                    <span className="day">Thursday</span
-                    ><span className="date">Jan 3</span>
-                  </th>
-                  <th>
-                    <span className="day">Friday</span
-                    ><span className="date">Jan 4</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="time">00:00</td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">01:00</td>
-                  <td>
-                    
-                  </td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">02:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">03:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">04:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">05:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">06:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">07:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">08:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">09:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">10:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">11:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">12:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">13:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">14:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">15:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">16:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">17:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">18:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">19:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">20:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">21:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">22:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td className="time">23:00</td>
-
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <Calendar />
           <div className="calendar-mobile-buttons">
             <button className="button-primary calendar-button">
               Previous Day
@@ -321,7 +87,7 @@ const NewMeeting = () => {
               Next Day
             </button>
           </div>
-        </div>
+        
             <div className="event-name">
               <div className='form-label'>
                 Event Name
@@ -364,11 +130,10 @@ const NewMeeting = () => {
                 
               </div>
             </div>
-            
 
 			
 			
-		</div>
+		  </div>
         <Footer />
     </div>
     
