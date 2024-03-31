@@ -5,11 +5,10 @@ class Calendar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      startDate: new Date(), // Current date as the start date
+      startDate: new Date(),
     };
   }
 
-  // Function to advance to the next week
   nextWeek = () => {
     const { startDate } = this.state;
     const nextWeekStartDate = new Date(startDate);
@@ -17,7 +16,6 @@ class Calendar extends React.Component {
     this.setState({ startDate: nextWeekStartDate });
   };
 
-  // Function to go back to the previous week
   prevWeek = () => {
     const { startDate } = this.state;
     const prevWeekStartDate = new Date(startDate);
@@ -55,7 +53,6 @@ class Calendar extends React.Component {
   };
 
   render() {
-    // Array of hours
     const hours = Array.from({ length: 24 }, (_, i) => i);
 
     return (
