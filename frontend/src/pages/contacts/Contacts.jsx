@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Contacts.css';
+import './contacts.css';
 import { CONTACT_REQUEST_URL, CONTACTS_URL, TOKEN_URL, USER_URL } from '../../constants/index.js';
 import axios from 'axios';
 import NavBar from '../../components/NavBar/NavBar.jsx';
