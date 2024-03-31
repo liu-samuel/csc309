@@ -1,144 +1,131 @@
 import { React, useState, useEffect } from 'react'
 import './NewMeeting.css'
-import axios from 'axios';
-import NavBar from '../../components/NavBar/NavBar';
-import Footer from '../../components/Footer/Footer';
-import Calendar from '../../components/Calendar/Calendar';
-import { EVENT_URL, TOKEN_URL, USER_URL } from '../../constants';
+import axios from 'axios'
+import NavBar from '../../components/NavBar/NavBar'
+import Footer from '../../components/Footer/Footer'
+import Calendar from '../../components/Calendar/Calendar'
+import { EVENT_URL, TOKEN_URL, USER_URL } from '../../constants'
 
 const NewMeeting = () => {
+    const [token, setToken] = useState('')
+    const [eventName, setEventName] = useState('')
+    const [invitee, setInvitee] = useState('')
+    const [deadline, setDeadline] = useState('')
+    const [inviteMessage, setInviteMessage] = useState('')
+    const [inviteSuccess, setInviteSuccess] = useState(false)
 
-  const [token, setToken] = useState("");
-  const [eventName, setEventName] = useState('');
-  const [invitee, setInvitee] = useState('');
-  const [deadline, setDeadline] = useState('');
-  const [inviteMessage, setInviteMessage] = useState('');
-  const [inviteSuccess, setInviteSuccess] = useState(false);
+    useEffect(() => {
+        async function fetchToken() {
+            try {
+                const response = await axios.post(`${TOKEN_URL}`, {
+                    username: 'stlaz123',
+                    password: 'Password12345',
+                })
+                setToken(response.data.access)
+            } catch (error) {
+                console.error('Error fetching token: ', error)
+            }
+        }
 
+        fetchToken()
+    }, [])
 
-  useEffect(() => {
-    async function fetchToken() {
-      try {
-        const response = await axios.post(`${TOKEN_URL}`, {
-          username: 'stlaz123',
-          password: 'Password12345',
-        });
-        setToken(response.data.access);
-      } catch (error) {
-        console.error("Error fetching token: ", error);
-      } 
+    async function sendMeetingInvite() {
+        try {
+            let inviteeID = await getIDFromEmail(invitee)
+            const postData = {
+                invitee: String(inviteeID),
+                deadline: deadline,
+                name: eventName,
+            }
+            const response = await axios.post(`${EVENT_URL}`, postData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            setInviteMessage(response.data.message)
+            setInviteSuccess(true)
+        } catch (error) {
+            console.error('Error creating new event: ', error)
+            setInviteMessage(error.response.data.error)
+            setInviteSuccess(false)
+        }
     }
 
-    fetchToken();
-  }, []);
-
-  async function sendMeetingInvite () {
-    try {
-      let inviteeID = await getIDFromEmail(invitee);
-      const postData = {
-        invitee: String(inviteeID),
-        deadline: deadline,
-        name: eventName,
-      }
-      const response = await axios.post(`${EVENT_URL}`,
-        postData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-      setInviteMessage(response.data.message);
-      setInviteSuccess(true);        
-    } catch (error) {
-      console.error("Error creating new event: ", error)
-      setInviteMessage(error.response.data.error);
-      setInviteSuccess(false);
+    async function getIDFromEmail(email) {
+        try {
+            const response = await axios.get(`${USER_URL}?email=${email}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            return response.data.user_id
+        } catch (error) {
+            console.error('Error creating new event: ', error)
+        }
     }
-  }
 
-  async function getIDFromEmail(email) {
-    try {
-      const response = await axios.get(`${USER_URL}?email=${email}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-      return response.data.user_id;
-    } catch (error) {
-      console.error("Error creating new event: ", error)
-    }
-  }
-  
+    return (
+        <div className='full-page'>
+            <NavBar />
+            <div className='content'>
+                <h1 className='title'>
+                    New Meeting With <span className='attending-name'>Ron</span>
+                </h1>
+                <Calendar />
+                <div className='calendar-mobile-buttons'>
+                    <button className='button-primary calendar-button'>
+                        Previous Day
+                    </button>
+                    <button className='button-primary calendar-button'>
+                        Next Day
+                    </button>
+                </div>
 
-  return (
-    <div className='full-page'>
-      <NavBar />
-      <div className="content">
-        <h1 className="title">
-            New Meeting With <span className="attending-name">Ron</span>
-        </h1>
-          <Calendar />
-          <div className="calendar-mobile-buttons">
-            <button className="button-primary calendar-button">
-              Previous Day
-            </button>
-            <button className="button-primary calendar-button">
-              Next Day
-            </button>
-          </div>
-        
-            <div className="event-name">
-              <div className='form-label'>
-                Event Name
-              </div>
-              <input 
-                type="text" 
-                placeholder="Event Name" 
-                value={eventName} 
-                onChange={(e) => setEventName(e.target.value)} 
-              /> 
-          </div>
-            <div className="search-bar">
-            <div className='form-label'>
-                Invite Others
-              </div>
-              <input 
-                type="text" 
-                placeholder="Invite Others" 
-                value={invitee} 
-                onChange={(e) => setInvitee(e.target.value)} 
-              /> 
+                <div className='event-name'>
+                    <div className='form-label'>Event Name</div>
+                    <input
+                        type='text'
+                        placeholder='Event Name'
+                        value={eventName}
+                        onChange={e => setEventName(e.target.value)}
+                    />
+                </div>
+                <div className='search-bar'>
+                    <div className='form-label'>Invite Others</div>
+                    <input
+                        type='text'
+                        placeholder='Invite Others'
+                        value={invitee}
+                        onChange={e => setInvitee(e.target.value)}
+                    />
+                </div>
+                <div className='deadline'>
+                    <div className='form-label'>Deadline To Respond</div>
+                    <input
+                        type='text'
+                        placeholder='YYYY-MM-DD'
+                        value={deadline}
+                        onChange={e => setDeadline(e.target.value)}
+                    />
+                </div>
+                <div className='submit-button'>
+                    <button
+                        className='button-primary'
+                        onClick={sendMeetingInvite}
+                    >
+                        Send Invite
+                    </button>
+                </div>
+                <div className='invite-message'>
+                    <div style={{ color: inviteSuccess ? 'green' : 'red' }}>
+                        {inviteMessage}
+                    </div>
+                </div>
             </div>
-            <div className="deadline">
-            <div className='form-label'>
-                Deadline To Respond
-              </div>
-              <input 
-                type="text" 
-                placeholder="YYYY-MM-DD" 
-                value={deadline} 
-                onChange={(e) => setDeadline(e.target.value)} 
-              /> 
-            </div>
-            <div className="submit-button">
-                <button className="button-primary" onClick={sendMeetingInvite}>Send Invite</button>
-            </div>
-            <div className='invite-message'>
-              <div style={{ color: inviteSuccess ? 'green' : 'red' }}>
-              {inviteMessage}
-                
-              </div>
-            </div>
-
-			
-			
-		  </div>
-        <Footer />
-    </div>
-    
-  )
+            <Footer />
+        </div>
+    )
 }
-
 
 export default NewMeeting

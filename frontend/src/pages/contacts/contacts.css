@@ -7,14 +7,12 @@
 }
 
 .full-page {
-	display: flex;
-	flex-direction: column;
-	height: 100vh;
-	max-height: 100vh;
-	width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-height: 100vh;
+    width: 100%;
 }
-
-
 
 .contacts {
     display: flex;
@@ -37,20 +35,21 @@
     align-items: center;
 }
 
-.name-email{
+.name-email {
     margin-left: 25px;
 }
 
 hr {
     width: 100%;
-    border: none; 
+    border: none;
     box-shadow: 0 0 0 0.25px black;
     margin-bottom: 2%;
     margin-top: 2%;
 }
 
-.add-friend, .active-page, .pending {
-
+.add-friend,
+.active-page,
+.pending {
     border-radius: 20px;
 }
 
@@ -72,13 +71,17 @@ hr {
 .email {
     font-size: small;
 }
-.name, .unfriend, .add, .delete {
+.name,
+.unfriend,
+.add,
+.delete {
     font-size: large;
     font-weight: bold;
 }
 
-
-.unfriend, .add, .delete {
+.unfriend,
+.add,
+.delete {
     width: 100px;
     height: 50px;
     border-radius: 50px;
@@ -91,7 +94,8 @@ hr {
     align-items: center;
 }
 
-.add, .delete {
+.add,
+.delete {
     padding: 30px;
 }
 
@@ -103,7 +107,9 @@ hr {
     background-color: #027639;
 }
 
-.active-page, .pending, .friends {
+.active-page,
+.pending,
+.friends {
     width: 20%;
     border-radius: 20px;
     padding-top: 10px;
@@ -113,15 +119,13 @@ hr {
     justify-content: center;
 }
 
-
-
 .friends {
     background-color: grey;
     color: white;
 }
 
 .pending {
-    background-color: #FFA500;
+    background-color: #ffa500;
     color: white;
 }
 
@@ -135,7 +139,7 @@ hr {
     display: flex;
     justify-content: center;
     color: white;
-    
+
     padding: 10px 5px;
 }
 
@@ -153,9 +157,8 @@ button {
     margin: 0;
 }
 
-
 .wrapper-div {
-    width:100%;
+    width: 100%;
 }
 
 .request-message {
@@ -167,25 +170,24 @@ button {
 .search-container {
     display: flex;
     justify-content: center;
-
 }
 
-.search{
+.search {
     display: flex;
     justify-content: center;
-    width: 50%; 
-    padding: 10px; 
-    font-size: 16px; 
-    border-radius: 5px; 
+    width: 50%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
 }
 
 input {
     display: flex;
     justify-content: center;
-    width: 50%; 
-    padding: 10px; 
-    font-size: 16px; 
-    border-radius: 5px; 
+    width: 50%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
 }
 
 .search-title {
@@ -202,10 +204,10 @@ input {
 }
 
 .friends:hover {
-    background-color: darkslategrey; 
+    background-color: darkslategrey;
 }
 .pending:hover {
-    background-color: #FF8C00;
+    background-color: #ff8c00;
 }
 
 .add-friend:hover {
@@ -216,15 +218,18 @@ input {
     background-color: #015026;
 }
 
-.unfriend:hover, .delete:hover {
+.unfriend:hover,
+.delete:hover {
     background-color: #b30000;
 }
 
 .active-page:hover {
-    background-color: #4D8DC9;
+    background-color: #4d8dc9;
 }
 
-.add:hover, .unfriend:hover, .delete:hover {
+.add:hover,
+.unfriend:hover,
+.delete:hover {
     cursor: pointer;
 }
 
@@ -234,14 +239,19 @@ input {
         height: 50px;
         border-radius: 25px;
     }
-    .name, .unfriend, .add, .delete {
+    .name,
+    .unfriend,
+    .add,
+    .delete {
         font-size: small;
         font-weight: normal;
     }
     .email {
         font-size: xx-small;
     }
-    .unfriend, .add, .delete {
+    .unfriend,
+    .add,
+    .delete {
         width: 70px;
         height: 37px;
         border-radius: 25px;
@@ -258,7 +268,9 @@ input {
         background-color: #027639;
     }
 
-    .friends, .pending, .add-friend {
+    .friends,
+    .pending,
+    .add-friend {
         font-size: small;
         width: 25%;
     }
@@ -266,7 +278,7 @@ input {
 
 @media screen and (min-width: 651px) {
     .initial-pic {
-        font-size:40px;
+        font-size: 40px;
     }
 }
 
@@ -275,5 +287,4 @@ input {
         position: absolute;
         bottom: 0;
     }
-
 }
