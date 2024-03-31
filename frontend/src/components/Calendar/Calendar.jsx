@@ -31,6 +31,29 @@ class Calendar extends React.Component {
     return date.toLocaleDateString();
   };
 
+  renderWeekdays = () => {
+    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const startDayIndex = this.state.startDate.getDay(); 
+    
+    const weekdayElements = Array.from({ length: 4 }, (_, i) => {
+      const weekdayIndex = (startDayIndex + i) % 7; 
+      const day = weekdays[weekdayIndex];
+      
+      return (
+        <th key={day}>
+          <span className="day">{day}</span>
+          <span className="date">{this.calculateDayDate(this.state.startDate, i)}</span>
+        </th>
+      );
+    });
+  
+    return (
+      <tr className="calendar-header">
+        {weekdayElements}
+      </tr>
+    );
+  };
+
   render() {
     // Array of hours
     const hours = Array.from({ length: 24 }, (_, i) => i);
@@ -61,14 +84,7 @@ class Calendar extends React.Component {
         </div>
         <table>
           <thead>
-            <tr className="calendar-header">
-            {['Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day, index) => (
-                <th key={day}>
-                  <span className="day">{day}</span>
-                  <span className="date">{this.calculateDayDate(this.state.startDate, index)}</span>
-                </th>
-              ))}
-            </tr>
+            {this.renderWeekdays()}
           </thead>
           <tbody>
             {hours.map(hour => (
