@@ -13,7 +13,7 @@ class Calendar extends React.Component {
   nextWeek = () => {
     const { startDate } = this.state;
     const nextWeekStartDate = new Date(startDate);
-    nextWeekStartDate.setDate(nextWeekStartDate.getDate() + 7);
+    nextWeekStartDate.setDate(nextWeekStartDate.getDate() + 4);
     this.setState({ startDate: nextWeekStartDate });
   };
 
@@ -21,7 +21,7 @@ class Calendar extends React.Component {
   prevWeek = () => {
     const { startDate } = this.state;
     const prevWeekStartDate = new Date(startDate);
-    prevWeekStartDate.setDate(prevWeekStartDate.getDate() - 7);
+    prevWeekStartDate.setDate(prevWeekStartDate.getDate() - 4);
     this.setState({ startDate: prevWeekStartDate });
   };
   
