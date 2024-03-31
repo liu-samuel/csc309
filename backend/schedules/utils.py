@@ -173,3 +173,12 @@ def is_valid_datetime_string(time):
     except:
         return False
     return True
+
+"""
+Adds hours and seconds to given time string
+"""
+def append_hours_minutes(time):
+    dt = datetime.datetime.strptime(time, "%Y-%m-%d")
+    dt = dt.replace(hour=0, minute=0, second=0)
+    formatted_datetime = dt.strftime("%Y-%m-%dT%H:%M")
+    return formatted_datetime

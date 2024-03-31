@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './contacts.css';
+import './Contacts.css';
 import { CONTACT_REQUEST_URL, CONTACTS_URL, TOKEN_URL, USER_URL } from '../../constants/index.js';
 import axios from 'axios';
 import NavBar from '../../components/NavBar/NavBar.jsx';
@@ -8,7 +8,6 @@ import Footer from '../../components/Footer/Footer.jsx';
 const Contacts = () => {
   const [contacts, setContacts] = useState([]);
   const [token, setToken] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const [isPendingPage, setIsPendingPage] = useState(false);
   const [isSearch, setIsSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,15 +18,13 @@ const Contacts = () => {
     async function fetchToken() {
       try {
         const response = await axios.post(`${TOKEN_URL}`, {
-          username: 'stlaz123',
-          password: 'Password12345',
+          username: 'user2',
+          password: 'password',
         });
         setToken(response.data.access);
       } catch (error) {
         console.error("Error fetching token: ", error);
-      } finally {
-        setIsLoading(false);
-      }
+      } 
     }
 
     fetchToken();
@@ -61,9 +58,7 @@ const Contacts = () => {
       }
     } catch (error) {
       console.error("Error fetching contacts: ", error);
-    } finally {
-      setIsLoading(false);
-    }
+    } 
   }
 
   useEffect(() => {
@@ -144,10 +139,6 @@ const Contacts = () => {
   const handleChange = (event) => {
     setSearchTerm(event.target.value);
   };
-
-  if (isLoading) {
-    return <div>Loading...</div>; 
-  }
 
 
   return (

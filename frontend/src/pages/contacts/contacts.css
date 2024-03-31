@@ -161,7 +161,6 @@ button {
 .request-message {
     display: flex;
     justify-content: center;
-    color: #FF5B61;
     font-style: italic;
 }
 

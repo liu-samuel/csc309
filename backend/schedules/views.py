@@ -11,7 +11,7 @@ from django.db import transaction
 
 from .models import Event, Availability
 from .serializers import EventSerializer, AvailabilitySerializer
-from .utils import time_orders_valid, start_end_same_day, round_time, split_into_increments, OverlapException, is_valid_datetime_string
+from .utils import time_orders_valid, start_end_same_day, round_time, split_into_increments, OverlapException, is_valid_datetime_string, append_hours_minutes
 
 import json
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -97,15 +97,13 @@ class EventsListAPIView(generics.ListCreateAPIView):
             missing_params.append('deadline')
         if len(missing_params) > 0:
             return Response({'error': f"Missing required parameter(s): {(', ').join(missing_params)}"}, status=status.HTTP_400_BAD_REQUEST)
-        
         # check that invitee is a number
         if not invitee.isnumeric():
             return Response({'error': "invitee ID must be a number"}, status=status.HTTP_400_BAD_REQUEST)
-        
         # check that deadline is a valid date time string
-        if not is_valid_datetime_string(deadline):
+        formatted_deadline = append_hours_minutes(deadline)
+        if not is_valid_datetime_string(formatted_deadline):
             return Response({'error': "deadline must be a valid DateTime string"}, status=status.HTTP_400_BAD_REQUEST)
-        
         # check that the two users are different
         if owner.pk == invitee:
             return Response({'error': 'Can\'t invite yourself'}, status=status.HTTP_400_BAD_REQUEST)
@@ -126,22 +124,25 @@ class EventsListAPIView(generics.ListCreateAPIView):
         event_data = {
             "owner": owner.pk,
             "invitee": invitee,
-            "deadline": deadline,
+            "deadline": formatted_deadline,
             "name": name,
             "is_finalized": is_finalized,
             "selected_time": selected_time
         }
+        print(event_data)
 
         serializer = EventSerializer(data=event_data)
         if serializer.is_valid():
             event = serializer.save()
-            response = Response(serializer.data, status=status.HTTP_201_CREATED)
+            response = Response({'message': 'Event Invite Sent'}, status=status.HTTP_201_CREATED)
             try:
                 send_request_email(owner=owner, invitee=invitee_user, event=event)
             except:
+                print("here")
                 return Response({'error': 'Could not send email'}, status=status.HTTP_400_BAD_REQUEST)
             
             return response
+        print("hereafter")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def send_request_email(owner, invitee, event):
