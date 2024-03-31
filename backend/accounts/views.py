@@ -9,6 +9,18 @@ from .serializers import ContactRequestSerializer, UserRegistrationSerializer
 
 User = get_user_model()
 
+class UserIdFromEmailAPIView(APIView):
+    def get(self, request):
+        email = request.query_params.get('email')
+        if not email:
+            return Response({'error': 'Email parameter is required'}, status=400)
+        
+        try:
+            user = User.objects.get(email=email)
+            return Response({'user_id': user.id}, status=200)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=404)
+
 class UserAPIView(APIView):
     def get(self, request, user_id):
         try:
