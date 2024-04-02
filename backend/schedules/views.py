@@ -100,6 +100,7 @@ class EventsListAPIView(generics.ListCreateAPIView):
         # check that invitee is a number
         if not invitee.isnumeric():
             return Response({'error': "invitee ID must be a number"}, status=status.HTTP_400_BAD_REQUEST)
+        deadline = deadline.split("T")[0]
         # check that deadline is a valid date time string
         formatted_deadline = append_hours_minutes(deadline)
         if not is_valid_datetime_string(formatted_deadline):
