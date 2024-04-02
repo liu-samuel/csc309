@@ -11,9 +11,34 @@ const MeetingDetails = () => {
   const [token, setToken] = useState("");
   const [eventName, setEventName] = useState("");
   const [invitee, setInvitee] = useState("");
-  const [deadline, setDeadline] = useState("December 30, 2024");
+  const [deadline, setDeadline] = useState("");
 
   const { event_id } = useParams();
+
+  function convertStringToDate(str) {
+    const map = [
+      "",
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    const year = str.slice(0, 4);
+    const month = str.slice(5, 7);
+    const day = str.slice(8, 10);
+    const hour = str.slice(11, 13);
+    const minute = str.slice(14, 16);
+
+    return `${map[month]} ${day}, ${year}, ${hour}:${minute}`;
+  }
 
   useEffect(() => {
     async function fetchToken() {
@@ -30,6 +55,26 @@ const MeetingDetails = () => {
 
     fetchToken();
   }, []);
+
+  useEffect(() => {
+    async function updateEventDetails() {
+      try {
+        const response = await axios.get(`${EVENT_URL}${event_id}/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setEventName(response.data.name);
+        setDeadline(convertStringToDate(response.data.deadline.slice(0, 16)));
+        console.log(response);
+      } catch (error) {
+        console.error("Error getting event details", error);
+      }
+    }
+
+    updateEventDetails();
+  }, [token]);
 
   async function getIDFromEmail(email) {
     try {
@@ -49,7 +94,7 @@ const MeetingDetails = () => {
       <NavBar />
       <div className="content">
         <h1 className="title">
-          Meeting Details With <span className="attending-name">Ron</span>
+          Meeting Details: <span className="attending-name">{eventName}</span>
         </h1>
         <Calendar editable event_id={event_id} />
         <div className="calendar-mobile-buttons">
