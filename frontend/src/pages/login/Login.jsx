@@ -16,7 +16,6 @@ export default function Login() {
     async function submit() {
         if (username && password) {
             setError("");
-            // console.log("submit");
             await login();
         }
     }
@@ -27,7 +26,6 @@ export default function Login() {
                 username: username,
                 password: password
             });
-            // console.log(response.data);
             if (response.data.access) {
                 // TODO: when context finished, set user context
                 navigate("/home");

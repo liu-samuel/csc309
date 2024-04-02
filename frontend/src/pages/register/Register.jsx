@@ -97,12 +97,7 @@ export default function Register() {
 
         if (numErrors === 0) {
             await register();
-            // console.log("submit");
-        } 
-        // else {
-        //     console.log(numErrors);
-        //     console.log("cannot submit");
-        // }
+        }
     }
 
     async function register() {
@@ -114,8 +109,6 @@ export default function Register() {
                 email: email,
                 password: password1
             });
-            // console.log(response);
-            // console.log(response.data);
 
             if (response.data.message === 'User created successfully') {
                 // TODO: when context finished, set user context
@@ -123,15 +116,11 @@ export default function Register() {
             }
         } catch (error) {
             if (error.response.data.error === "A user with that username already exists.") {
-                // console.log("user already exists");
                 setUsernameError("This username is already taken");
-                // console.error("Error registering user: ", response.error);
             } else if (error.response.data.error === "A user with that email already exists.") {
-                // console.log("email already exists");
                 setEmailError("This email is already taken");
             }
-        // console.error("Error registering user: ", error);
-      } 
+        } 
     }
 
     return (
