@@ -79,6 +79,7 @@ class Calendar extends React.Component {
         }
       }
 
+      const body_request = [];
       this.state.calendarItems.forEach((row) => {
         row.items.forEach(async (cell) => {
           if (cell.availability !== "") {
@@ -89,26 +90,32 @@ class Calendar extends React.Component {
               .toISOString()
               .slice(0, 16);
 
-            const body = JSON.stringify({
+            const body = {
               email: email,
               start_time: cell.time_start,
               end_time,
               type: cell.availability,
-            });
+            };
 
-            await axios.post(
-              `${EVENT_AVAILABILITY_URL(this.props.event_id)}`,
-              body,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "application/json",
-                },
-              }
-            );
+            body_request.push(body);
           }
         });
       });
+
+      const availability_data = JSON.stringify({
+        availabilities: body_request,
+      });
+
+      await axios.post(
+        `${EVENT_AVAILABILITY_URL(this.props.event_id)}`,
+        availability_data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       // return response.data.user_id;
     } catch (error) {
