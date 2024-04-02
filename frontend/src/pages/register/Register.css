@@ -1,0 +1,94 @@
+.register-fullpage {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    align-items: center;
+}
+
+.register-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    width: 80%;
+    max-width: 850px;
+    padding: 45px 70px 20px 70px;
+    gap: 15px;
+}
+
+.register-heading {
+    font-weight: normal;
+    font-size: 48px;
+    margin: 0;
+    text-align: center;
+}
+ 
+.register-subheading {
+    font-weight: 300;
+    text-align: center;
+    margin: 0;
+    line-height: 1;
+    font-size: 20px;
+}
+
+.register-form {
+    width: inherit;
+}
+
+form div {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+}
+
+.register-field-label {
+    padding-bottom: 4px;
+    font-size: 13px;
+}
+ 
+.register-field-input {
+    border-radius: 5px;
+    border-width: thin;
+    padding: 8px;
+    width: 100%;
+    font-size: 13px;
+}
+
+.register-submit {
+    padding: 8px;
+    border-radius: 5px;
+    margin-top: 4px;
+    text-align: center;
+    text-decoration: none;
+    background-color: #027639;
+    color: #fff;
+    font-weight: bold;
+    font-size: 13px;
+}
+ 
+.register-submit:hover {
+    background-color: rgb(2, 118, 57, 0.75);
+}
+
+.register-form-error {
+    color: red;
+    font-size: 13px;
+    margin: 0;
+    padding-top: 4px;
+    font-style: italic;
+}
+
+@media (max-width: 650px) {
+    .register-main {
+        padding-left: 30px;
+        padding-right: 30px;
+        width: 85%;
+    }
+}
+
+@media (max-width: 500px) {
+    .register-main {
+        width: 95%;
+    }
+}
