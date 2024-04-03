@@ -7,9 +7,9 @@ import { useNavigate } from 'react-router-dom'
 const Landing = () => {
     const navigate = useNavigate()
     return (
-        <div className='full-page'>
+        <div className='landing-full-page'>
             <NavBar />
-            <main className='content'>
+            <main className='landing-content'>
                 <h1>
                     Make scheduling <span className='green-underline'>fun</span>
                 </h1>

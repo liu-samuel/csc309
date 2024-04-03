@@ -1,4 +1,4 @@
-.full-page {
+.landing-full-page {
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -6,7 +6,7 @@
     align-items: center;
 }
 
-.content {
+.landing-content {
     display: flex;
     flex-direction: column;
     align-items: center;
