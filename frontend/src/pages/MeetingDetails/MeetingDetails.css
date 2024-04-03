@@ -1,4 +1,4 @@
-.full-page {
+.md-full-page {
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -8,7 +8,7 @@
 }
 
 /* TODO: This should allow scroll on mobile */
-.meeting-details-content {
+.md-meeting-details-content {
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -22,7 +22,7 @@
 }
 
 @media (max-width: 767px) {
-  .content {
+  .md-content {
     padding: 40px;
   }
 }
@@ -48,7 +48,7 @@ tr {
   padding-left: 50px;
 }
 
-.time {
+.md-time {
   position: absolute;
   left: 0px;
   top: -10px;
@@ -70,12 +70,12 @@ th {
   border-bottom: 1px solid rgba(0, 0, 0, 0.25);
 }
 
-.day {
+.md-day {
   font-weight: 400;
   font-size: 18px;
 }
 
-.date {
+.md-date {
   font-weight: 400;
   color: rgba(0, 0, 0, 0.5);
   font-size: 14px;
@@ -93,7 +93,7 @@ td:nth-child(2) {
   border-left: 1px solid rgba(0, 0, 0, 0.25);
 }
 
-.meetings {
+.md-meetings {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -105,24 +105,24 @@ td:nth-child(2) {
 }
 
 @media (max-width: 1108px) {
-  .meetings {
+  .md-meetings {
     width: 100%;
     max-width: none;
   }
 }
 
-.attending-name {
+.md-attending-name {
   color: #027639;
   font-weight: bold;
 }
 
-.submit-button {
+.md-submit-button {
   width: 100%;
   display: flex;
   justify-content: center;
 }
 
-.button-primary {
+.md-button-primary {
   background-color: #027639;
   color: #fff;
   margin-top: 10px;
@@ -132,10 +132,11 @@ td:nth-child(2) {
   border: none;
   justify-content: center;
   padding: 20px 30px;
+  min-width: fit-content;
 }
 
-.calendar-available-box,
-.calendar-preferred-box {
+.md-calendar-available-box,
+.md-calendar-preferred-box {
   width: 80%;
   height: 100%;
   display: block;
@@ -147,7 +148,7 @@ td:nth-child(2) {
     }
 } */
 
-.calendar-color-index {
+.md-calendar-color-index {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -155,15 +156,15 @@ td:nth-child(2) {
   align-items: end;
 }
 
-.secondary-green-background {
+.md-secondary-green-background {
   background-color: #03a200;
 }
 
-.blue-background {
+.md-blue-background {
   background-color: #1400ff;
 }
 
-.button-primary:hover {
+.md-button-primary:hover {
   background-color: #01512f;
   cursor: pointer;
 }
@@ -173,62 +174,62 @@ h3 {
   font-weight: 400;
 }
 
-.white {
+.md-white {
   color: #fff;
 }
 
-.container {
+.md-container {
   padding: 20px;
 }
 
-.form-label {
+.md-form-label {
   display: flex;
   justify-content: center;
   margin-bottom: 2%;
 }
 
-.invite-message {
+.md-invite-message {
   display: flex;
   justify-content: center;
   font-style: italic;
   width: 100%;
 }
 
-.button-secondary {
+.md-button-secondary {
   background-color: #fff;
   color: #027639;
   margin-top: 10px;
   border: 1px solid #027639;
 }
 
-.button-secondary:hover {
+.md-button-secondary:hover {
   background-color: #e0e0e0;
 }
 
-.with-meeting {
+.md-with-meeting {
   background-color: aquamarine;
   cursor: pointer;
 }
 
-.meeting-tile {
+.md-meeting-tile {
   margin: 8px;
 }
 
-.meeting-tile-subtext {
+.md-meeting-tile-subtext {
   font-size: 12px;
   color: rgba(0, 0, 0, 0.75);
 }
 
-.search-bar,
-.deadline,
-.event-name {
+.md-search-bar,
+.md-deadline,
+.md-event-name {
   position: relative;
   width: 100%;
 }
 
-.search-bar input[type="text"],
-.deadline input[type="text"],
-.event-name input[type="text"] {
+.md-search-bar input[type="text"],
+.md-deadline input[type="text"],
+.md-event-name input[type="text"] {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
@@ -236,22 +237,22 @@ h3 {
   font-size: 16px;
 }
 
-.search-bar input[type="text"]:focus,
-.deadline input[type="text"]:focus,
-.event-name input[type="text"]:focus {
+.md-search-bar input[type="text"]:focus,
+.md-deadline input[type="text"]:focus,
+.md-event-name input[type="text"]:focus {
   outline: none;
   border-color: #007bff;
 }
 
-.search-bar input[type="text"]::placeholder,
-.deadline input[type="text"]::placeholder,
-.event-name input[type="text"]::placeholder {
+.md-search-bar input[type="text"]::placeholder,
+.md-deadline input[type="text"]::placeholder,
+.md-event-name input[type="text"]::placeholder {
   color: #999;
 }
 
-.search-bar input[type="text"] + i,
-.deadline input[type="text"] + i,
-.event-name input[type="text"] + i {
+.md-search-bar input[type="text"] + i,
+.md-deadline input[type="text"] + i,
+.md-event-name input[type="text"] + i {
   position: absolute;
   right: 10px;
   top: 50%;
@@ -260,14 +261,14 @@ h3 {
 }
 
 @media (max-width: 900px) {
-  .calendar-color-index,
-  .calendar-index-container {
+  .md-calendar-color-index,
+  .md-calendar-index-container {
     display: block;
     width: 100%;
   }
 }
 
-.calendar {
+.md-calendar {
   height: 100%;
   width: 100%;
   background-color: #fff;
@@ -282,19 +283,19 @@ h3 {
   overflow-x: auto; /* Add this line */
 }
 
-.calendar-container {
+.md-calendar-container {
   overflow-y: scroll;
   max-height: 100%;
   padding: 20px;
 }
 
-.calendar-header {
+.md-calendar-header {
   display: flex;
   justify-content: space-between;
   flex-direction: row;
 }
 
-.calendar-color-index {
+.md-calendar-color-index {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -302,14 +303,14 @@ h3 {
   align-items: end;
 }
 
-.calendar-available-box,
-.calendar-preferred-box {
+.md-calendar-available-box,
+.md-calendar-preferred-box {
   width: 100%;
   height: 100%;
   display: block;
 }
 
-.calendar-index-container {
+.md-calendar-index-container {
   display: flex;
   flex-direction: row;
   flex-grow: 1;
@@ -317,18 +318,18 @@ h3 {
   justify-content: flex-end;
 }
 
-.calendar-index-container p {
+.md-calendar-index-container p {
   padding: 0;
   margin: 0;
   width: 20%;
   padding-right: 100px;
 }
 
-.calendar-mobile-buttons {
+.md-calendar-mobile-buttons {
   display: none;
 }
 
-.calendar-button {
+.md-calendar-button {
   padding: 1rem 1rem;
   border-radius: 10px;
   font-size: 1.375rem;
@@ -343,37 +344,37 @@ h3 {
   }
 
   /* Calendar heading stuff */
-  .calendar-header,
-  .calendar-color-index,
-  .calendar-index-container {
+  .md-calendar-header,
+  .md-calendar-color-index,
+  .md-calendar-index-container {
     display: block;
     width: 100%;
   }
 
-  .calendar {
+  .md-calendar {
     gap: 5px;
   }
 
-  .calendar h2 {
+  .md-calendar h2 {
     margin-left: 0;
     text-align: center;
   }
 
-  .calendar-available-box,
-  .calendar-preferred-box {
+  .md-calendar-available-box,
+  .md-calendar-preferred-box {
     margin-top: 5px;
     height: 20px;
   }
 
-  .calendar-index-container {
+  .md-calendar-index-container {
     margin: 3px 0;
   }
 
-  .calendar-mobile-buttons {
+  .md-calendar-mobile-buttons {
     display: flex;
   }
 
-  .calendar-mobile-buttons > * {
+  .md-calendar-mobile-buttons > * {
     width: 50%;
     margin: 0 5px;
   }
@@ -382,16 +383,16 @@ h3 {
 /**
  * Added
  */
-.deadline {
+.md-deadline {
   font-size: 1.5rem;
   font-weight: bold;
 }
-.deadline-text {
+.md-deadline-text {
   color: red;
   text-decoration: underline;
 }
 
-.bottom-wrapper {
+.md-bottom-wrapper {
   display: flex;
   width: 100%;
   justify-content: space-between;
@@ -399,6 +400,6 @@ h3 {
   align-items: center;
 }
 
-.bottom-wrapper .button {
+.md-bottom-wrapper .button {
   width: 50%;
 }

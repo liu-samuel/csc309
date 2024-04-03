@@ -90,27 +90,27 @@ const MeetingDetails = () => {
   }
 
   return (
-    <div className="full-page">
+    <div className="md-full-page">
       <NavBar />
-      <div className="meeting-details-content">
-        <h1 className="title">
-          Meeting Details: <span className="attending-name">{eventName}</span>
+      <div className="md-meeting-details-content">
+        <h1 className="md-title">
+          Meeting Details: <span className="md-attending-name">{eventName}</span>
         </h1>
         <Calendar editable event_id={event_id} />
-        <div className="calendar-mobile-buttons">
-          <button className="button-primary calendar-button">
+        <div className="md-calendar-mobile-buttons">
+          <button className="md-button-primary md-calendar-button">
             Previous Day
           </button>
-          <button className="button-primary calendar-button">Next Day</button>
+          <button className="md-button-primary md-calendar-button">Next Day</button>
         </div>
 
-        <div className="bottom-wrapper">
-          <div className="deadline">
+        <div className="md-bottom-wrapper">
+          <div className="md-deadline">
             Deadline to schedule:{" "}
-            <span className="deadline-text">{deadline}</span>
+            <span className="md-deadline-text">{deadline}</span>
           </div>
 
-          <div className="button button-primary">Schedule Meeting</div>
+          <div className="md-button md-button-primary">Schedule Meeting</div>
         </div>
       </div>
 
