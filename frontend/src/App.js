@@ -13,55 +13,43 @@ function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path='/'>
-                    <Route index element={<Landing />} />
-                </Route>
-                <Route path='/home'>
-                    <Route
-                        index
-                        element={
-                            <RequireAuth>
-                                <Home />
-                            </RequireAuth>
-                        }
-                    />
-                </Route>
-                <Route path='/contacts'>
-                    <Route
-                        index
-                        element={
-                            <RequireAuth>
-                                <Contacts />
-                            </RequireAuth>
-                        }
-                    />
-                </Route>
-                <Route path='/new_meeting'>
-                    <Route
-                        index
-                        element={
-                            <RequireAuth>
-                                <NewMeeting />
-                            </RequireAuth>
-                        }
-                    />
-                </Route>
-                <Route path='/register'>
-                    <Route index element={<Register />} />
-                </Route>
-                <Route path='/login'>
-                    <Route index element={<Login />} />
-                </Route>
-                <Route path='/meeting_details/:event_id'>
-                    <Route
-                        index
-                        element={
-                            <RequireAuth>
-                                <MeetingDetails />
-                            </RequireAuth>
-                        }
-                    />
-                </Route>
+                <Route path='/' element={<Landing />} />
+
+                <Route
+                    path='/home'
+                    element={
+                        <RequireAuth>
+                            <Home />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path='/contacts'
+                    element={
+                        <RequireAuth>
+                            <Contacts />
+                        </RequireAuth>
+                    }
+                />
+                <Route
+                    path='/new_meeting'
+                    element={
+                        <RequireAuth>
+                            <NewMeeting />
+                        </RequireAuth>
+                    }
+                />
+
+                <Route path='/register' element={<Register />} />
+                <Route path='/login' element={<Login />} />
+                <Route
+                    path='/meeting_details/:event_id'
+                    element={
+                        <RequireAuth>
+                            <MeetingDetails />
+                        </RequireAuth>
+                    }
+                />
             </Routes>
         </BrowserRouter>
     )

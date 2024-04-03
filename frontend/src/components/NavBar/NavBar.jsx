@@ -1,32 +1,43 @@
 import React from 'react'
 import './NavBar.css'
 import { useAuth } from '../../contexts/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
-const NavBar = (authenticated = true) => {
-    const { user } = useAuth()
+const NavBar = () => {
+    const { user, logout } = useAuth()
+    const navigate = useNavigate()
 
     let navLinks = [
         <li className='nav-link'>
-            <a href='./register'>Get Started</a>
+            <span onClick={() => navigate('/register')}>Get Started</span>
         </li>,
         <li className='nav-link'>
-            <a href='./login'>Log In</a>
+            <span onClick={() => navigate('/login')}>Log In</span>
         </li>,
     ]
 
     if (user) {
         navLinks = [
             <li className='nav-link'>
-                <a href='./home'>Home</a>
+                <span onClick={() => navigate('/home')}>Home</span>
             </li>,
             <li className='nav-link'>
-                <a href='./new_meeting'>New Meeting</a>
+                <span onClick={() => navigate('/new_meeting')}>
+                    New Meeting
+                </span>
             </li>,
             <li className='nav-link'>
-                <a href='./contacts'>Friends</a>
+                <span onClick={() => navigate('/contacts')}>Contacts</span>
             </li>,
             <button className='nav-link'>
-                <a href='./login'>Log out</a>
+                <span
+                    onClick={() => {
+                        logout()
+                        navigate('/login')
+                    }}
+                >
+                    Log out
+                </span>
             </button>,
         ]
     }

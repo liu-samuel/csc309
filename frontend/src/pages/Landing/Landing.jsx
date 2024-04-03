@@ -18,20 +18,18 @@ const Landing = () => {
                     most to you.
                 </h2>
                 <div className='buttons'>
-                    <a
+                    <button
                         className='primary'
-                        href='./register.html'
                         onClick={() => navigate('/register')}
                     >
                         Get Started
-                    </a>
-                    <a
+                    </button>
+                    <button
                         className='secondary'
-                        href='./login.html'
                         onClick={() => navigate('/login')}
                     >
                         Log In
-                    </a>
+                    </button>
                 </div>
             </main>
             <Footer />
