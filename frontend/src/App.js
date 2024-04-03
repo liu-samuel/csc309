@@ -7,6 +7,7 @@ import Login from './pages/login/Login'
 import MeetingDetails from './pages/MeetingDetails/MeetingDetails'
 import Landing from './pages/Landing/Landing'
 import RequireAuth from './components/RequireAuth/RequireAuth'
+import Home from './pages/Home/Home'
 
 function App() {
     return (
@@ -14,6 +15,16 @@ function App() {
             <Routes>
                 <Route path='/'>
                     <Route index element={<Landing />} />
+                </Route>
+                <Route path='/home'>
+                    <Route
+                        index
+                        element={
+                            <RequireAuth>
+                                <Home />
+                            </RequireAuth>
+                        }
+                    />
                 </Route>
                 <Route path='/contacts'>
                     <Route
