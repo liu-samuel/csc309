@@ -8,7 +8,7 @@
 }
 
 /* TODO: This should allow scroll on mobile */
-.content {
+.meeting-details-content {
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -136,10 +136,16 @@ td:nth-child(2) {
 
 .calendar-available-box,
 .calendar-preferred-box {
-  width: 100%;
+  width: 80%;
   height: 100%;
   display: block;
 }
+
+/* @media (max-width: 1463px) {
+    .calendar-available-box, .calendar-preferred-box {
+        width: 50% !important;
+    }
+} */
 
 .calendar-color-index {
   display: flex;
@@ -308,12 +314,14 @@ h3 {
   flex-direction: row;
   flex-grow: 1;
   width: 50%;
+  justify-content: flex-end;
 }
 
 .calendar-index-container p {
   padding: 0;
   margin: 0;
   width: 20%;
+  padding-right: 100px;
 }
 
 .calendar-mobile-buttons {

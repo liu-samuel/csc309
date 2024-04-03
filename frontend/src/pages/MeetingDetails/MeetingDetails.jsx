@@ -92,7 +92,7 @@ const MeetingDetails = () => {
   return (
     <div className="full-page">
       <NavBar />
-      <div className="content">
+      <div className="meeting-details-content">
         <h1 className="title">
           Meeting Details: <span className="attending-name">{eventName}</span>
         </h1>
