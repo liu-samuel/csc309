@@ -1,7 +1,9 @@
 import React from 'react'
 import './NavBar.css'
+import { useAuth } from '../../contexts/AuthContext'
 
 const NavBar = (authenticated = true) => {
+    const { user } = useAuth()
     let navLinks = [
         <li className='nav-link'>
             <a href='./register'>Get Started</a>
@@ -11,7 +13,7 @@ const NavBar = (authenticated = true) => {
         </li>,
     ]
 
-    if (authenticated) {
+    if (user) {
         navLinks = [
             <li className='nav-link'>
                 <a href='./home'>Home</a>

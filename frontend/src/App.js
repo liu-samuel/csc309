@@ -5,11 +5,15 @@ import NewMeeting from './pages/NewMeeting/NewMeeting'
 import Register from './pages/register/Register'
 import Login from './pages/login/Login'
 import MeetingDetails from './pages/MeetingDetails/MeetingDetails'
+import Landing from './pages/Landing/Landing'
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
+                <Route path='/'>
+                    <Route index element={<Landing />} />
+                </Route>
                 <Route path='/contacts'>
                     <Route index element={<Contacts />} />
                 </Route>
