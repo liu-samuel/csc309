@@ -8,3 +8,5 @@ export const REGISTER_URL = 'http://localhost:8000/accounts/register/'
 export const EVENT_AVAILABILITY_URL = event_id => {
     return `http://localhost:8000/schedules/events/${event_id}/availability/`
 }
+export const CURRENT_USER_URL =
+    'http://localhost:8000/accounts/user/current_user/'

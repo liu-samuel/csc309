@@ -4,7 +4,7 @@ import axios from 'axios'
 import './Login.css'
 import NavBar from '../../components/NavBar/NavBar.jsx'
 import Footer from '../../components/Footer/Footer.jsx'
-import { TOKEN_URL } from '../../constants/index.js'
+import { CURRENT_USER_URL, TOKEN_URL } from '../../constants/index.js'
 import { useAuth } from '../../contexts/AuthContext.js'
 
 export default function Login() {
@@ -24,12 +24,33 @@ export default function Login() {
 
     async function handleLogin() {
         try {
-            const response = await axios.post(`${TOKEN_URL}`, {
+            let response = await axios.post(`${TOKEN_URL}`, {
                 username: username,
                 password: password,
             })
             if (response.data.access) {
-                login(username, firstName, lastName, emai, response.data.access)
+                const token = response.data.access
+                response = await axios.get(CURRENT_USER_URL, {
+                    headers: {
+                        Authorization: `Bearer ${response.data.access}`,
+                    },
+                })
+                if (
+                    !response.data.username ||
+                    !response.data.first_name ||
+                    !response.data.last_name ||
+                    !response.data.email ||
+                    !token
+                ) {
+                    console.error('Error getting current user!')
+                }
+                login(
+                    response.data.username,
+                    response.data.first_name,
+                    response.data.last_name,
+                    response.data.email,
+                    token
+                )
                 navigate('/home')
             }
         } catch (error) {
