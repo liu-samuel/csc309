@@ -6,6 +6,7 @@ import Register from './pages/register/Register'
 import Login from './pages/login/Login'
 import MeetingDetails from './pages/MeetingDetails/MeetingDetails'
 import Landing from './pages/Landing/Landing'
+import RequireAuth from './components/RequireAuth/RequireAuth'
 
 function App() {
     return (
@@ -15,10 +16,24 @@ function App() {
                     <Route index element={<Landing />} />
                 </Route>
                 <Route path='/contacts'>
-                    <Route index element={<Contacts />} />
+                    <Route
+                        index
+                        element={
+                            <RequireAuth>
+                                <Contacts />
+                            </RequireAuth>
+                        }
+                    />
                 </Route>
                 <Route path='/new_meeting'>
-                    <Route index element={<NewMeeting />} />
+                    <Route
+                        index
+                        element={
+                            <RequireAuth>
+                                <NewMeeting />
+                            </RequireAuth>
+                        }
+                    />
                 </Route>
                 <Route path='/register'>
                     <Route index element={<Register />} />
@@ -27,7 +42,14 @@ function App() {
                     <Route index element={<Login />} />
                 </Route>
                 <Route path='/meeting_details/:event_id'>
-                    <Route index element={<MeetingDetails />} />
+                    <Route
+                        index
+                        element={
+                            <RequireAuth>
+                                <MeetingDetails />
+                            </RequireAuth>
+                        }
+                    />
                 </Route>
             </Routes>
         </BrowserRouter>

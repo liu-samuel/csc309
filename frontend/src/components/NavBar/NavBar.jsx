@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext'
 
 const NavBar = (authenticated = true) => {
     const { user } = useAuth()
+
     let navLinks = [
         <li className='nav-link'>
             <a href='./register'>Get Started</a>
