@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext({
     user: undefined,
-    login: (username, firstName, lastName, email, token) => {},
+    login: (username, firstName, lastName, email, id, token) => {},
     logout: () => {},
 })
 
@@ -22,8 +22,8 @@ export const AuthProvider = ({ children }) => {
         }
     }, [user])
 
-    const login = (username, firstName, lastName, email, token) => {
-        setUser({ username, firstName, lastName, email, token })
+    const login = (username, firstName, lastName, email, id, token) => {
+        setUser({ username, firstName, lastName, email, id, token })
     }
 
     const logout = () => {

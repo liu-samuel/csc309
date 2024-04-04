@@ -40,6 +40,7 @@ export default function Login() {
                     !response.data.first_name ||
                     !response.data.last_name ||
                     !response.data.email ||
+                    !response.data.id ||
                     !token
                 ) {
                     console.error('Error getting current user!')
@@ -49,6 +50,7 @@ export default function Login() {
                     response.data.first_name,
                     response.data.last_name,
                     response.data.email,
+                    response.data.id,
                     token
                 )
                 navigate('/home')
