@@ -137,7 +137,7 @@ const HomeCalendar = ({ events }) => {
                     <tr className='header'>{renderHeaderDates()}</tr>
                 </thead>
 
-                <tbody>{events && renderCalendarCells()}</tbody>
+                <tbody>{renderCalendarCells()}</tbody>
             </table>
         </div>
     )
