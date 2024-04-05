@@ -293,7 +293,12 @@ input {
     }
 }
 
-footer {
-    position: absolute;
-    bottom: 0;
+.contacts-content{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.contacts-footer {
+    margin-top:auto;
 }

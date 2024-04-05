@@ -11,6 +11,7 @@ const NewMeeting = () => {
     const [eventName, setEventName] = useState('')
     const [invitee, setInvitee] = useState('')
     const [deadline, setDeadline] = useState('')
+    const [agenda, setAgenda] = useState('')
     const [inviteMessage, setInviteMessage] = useState('')
     const [inviteSuccess, setInviteSuccess] = useState(false);
     const {user, logout} = useAuth();
@@ -22,6 +23,7 @@ const NewMeeting = () => {
                 invitee: String(inviteeID),
                 deadline: deadline,
                 name: eventName,
+                agenda: agenda,
             }
             const response = await axios.post(`${EVENT_URL}`, postData, {
                 headers: {
@@ -92,6 +94,14 @@ const NewMeeting = () => {
                         placeholder='YYYY-MM-DD'
                         value={deadline}
                         onChange={e => setDeadline(e.target.value)}
+                    />
+                </div>
+                <div className='agenda'>
+                  <div className='form-label'>Meeting Agenda</div>
+                  <textarea
+                        placeholder='Agenda'
+                        value={agenda}
+                        onChange={e => setAgenda(e.target.value)}
                     />
                 </div>
                 <div className='submit-button'>

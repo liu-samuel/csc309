@@ -10,6 +10,7 @@ class Event(models.Model):
     name = models.CharField(max_length=50, blank=True)
     is_finalized = models.BooleanField()
     selected_time = models.DateTimeField(null=True)
+    agenda = models.CharField(max_length=1000, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.name:

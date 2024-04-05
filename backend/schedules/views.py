@@ -75,6 +75,7 @@ class EventsListAPIView(generics.ListCreateAPIView):
         invitee = request.data.get("invitee")
         deadline = request.data.get("deadline")
         name = request.data.get("name")
+        agenda = request.data.get("agenda")
         is_finalized = False
         selected_time = None
         
@@ -119,7 +120,8 @@ class EventsListAPIView(generics.ListCreateAPIView):
             "deadline": formatted_deadline,
             "name": name,
             "is_finalized": is_finalized,
-            "selected_time": selected_time
+            "selected_time": selected_time,
+            "agenda": agenda,
         }
 
         serializer = EventSerializer(data=event_data)

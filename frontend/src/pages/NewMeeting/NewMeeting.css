@@ -197,14 +197,21 @@ h3 {
 
 .search-bar,
 .deadline,
-.event-name {
+.event-name,
+.agenda {
     position: relative;
     width: 100%;
 }
 
+.agenda textarea { 
+    height: 150px; 
+    resize: vertical; 
+}
+
 .search-bar input[type='text'],
 .deadline input[type='text'],
-.event-name input[type='text'] {
+.event-name input[type='text'],
+.agenda textarea {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
@@ -214,20 +221,23 @@ h3 {
 
 .search-bar input[type='text']:focus,
 .deadline input[type='text']:focus,
-.event-name input[type='text']:focus {
+.event-name input[type='text']:focus,
+.agenda textarea:focus {
     outline: none;
     border-color: #007bff;
 }
 
 .search-bar input[type='text']::placeholder,
 .deadline input[type='text']::placeholder,
-.event-name input[type='text']::placeholder {
+.event-name input[type='text']::placeholder,
+.agenda textarea::placeholder {
     color: #999;
 }
 
 .search-bar input[type='text'] + i,
 .deadline input[type='text'] + i,
-.event-name input[type='text'] + i {
+.event-name input[type='text'] + i,
+.agenda textarea + i {
     position: absolute;
     right: 10px;
     top: 50%;
