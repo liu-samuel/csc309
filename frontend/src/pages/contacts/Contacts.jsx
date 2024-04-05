@@ -135,7 +135,7 @@ const Contacts = () => {
     }
 
     return (
-        <div>
+        <div className='contacts-content'>
             <NavBar />
             <div className='contact-navbar'>
                 <button
@@ -251,7 +251,10 @@ const Contacts = () => {
                     ))
                 )}
             </div>
-            <Footer />
+            <div className='contacts-footer'>
+                <Footer/>
+            </div>
+            
         </div>
     )
 }

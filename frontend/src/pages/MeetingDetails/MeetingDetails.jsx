@@ -12,6 +12,7 @@ const MeetingDetails = () => {
   const [eventName, setEventName] = useState("");
   const [invitee, setInvitee] = useState("");
   const [deadline, setDeadline] = useState("");
+  const [agenda, setAgenda] = useState("");
 
   const { event_id } = useParams();
 
@@ -67,6 +68,7 @@ const MeetingDetails = () => {
 
         setEventName(response.data.name);
         setDeadline(convertStringToDate(response.data.deadline.slice(0, 16)));
+        setAgenda(response.data.agenda);
         console.log(response);
       } catch (error) {
         console.error("Error getting event details", error);
@@ -111,6 +113,15 @@ const MeetingDetails = () => {
           </div>
 
           <div className="md-button md-button-primary">Schedule Meeting</div>
+        </div>
+
+        <div className="meeting-agenda-container">
+          <div className="agenda-title">Agenda</div>
+          <hr />  
+
+          <div className="meeting-agenda"> 
+            {agenda}
+          </div>
         </div>
       </div>
 
