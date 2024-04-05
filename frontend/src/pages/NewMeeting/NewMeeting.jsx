@@ -5,30 +5,15 @@ import NavBar from '../../components/NavBar/NavBar'
 import Footer from '../../components/Footer/Footer'
 import Calendar from '../../components/Calendar/Calendar'
 import { EVENT_URL, TOKEN_URL, USER_URL } from '../../constants'
+import { useAuth } from '../../contexts/AuthContext'
 
 const NewMeeting = () => {
-    const [token, setToken] = useState('')
     const [eventName, setEventName] = useState('')
     const [invitee, setInvitee] = useState('')
     const [deadline, setDeadline] = useState('')
     const [inviteMessage, setInviteMessage] = useState('')
-    const [inviteSuccess, setInviteSuccess] = useState(false)
-
-    useEffect(() => {
-        async function fetchToken() {
-            try {
-                const response = await axios.post(`${TOKEN_URL}`, {
-                    username: 'stlaz123',
-                    password: 'Password12345',
-                })
-                setToken(response.data.access)
-            } catch (error) {
-                console.error('Error fetching token: ', error)
-            }
-        }
-
-        fetchToken()
-    }, [])
+    const [inviteSuccess, setInviteSuccess] = useState(false);
+    const {user, logout} = useAuth();
 
     async function sendMeetingInvite() {
         try {
@@ -40,7 +25,7 @@ const NewMeeting = () => {
             }
             const response = await axios.post(`${EVENT_URL}`, postData, {
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${user.token}`,
                 },
             })
             setInviteMessage(response.data.message)
@@ -56,7 +41,7 @@ const NewMeeting = () => {
         try {
             const response = await axios.get(`${USER_URL}?email=${email}`, {
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${user.token}`,
                 },
             })
             return response.data.user_id
@@ -68,9 +53,9 @@ const NewMeeting = () => {
     return (
         <div className='full-page'>
             <NavBar />
-            <div className='content'>
+            <div className='new-meeting-content'>
                 <h1 className='title'>
-                    New Meeting With <span className='attending-name'>Ron</span>
+                    New Meeting With <span className='attending-name'>{user.firstName} {user.lastName}</span>
                 </h1>
                 <Calendar />
                 <div className='calendar-mobile-buttons'>
