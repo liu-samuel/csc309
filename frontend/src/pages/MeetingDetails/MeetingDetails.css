@@ -318,8 +318,8 @@ h3 {
   justify-content: flex-end;
 }
 
-.md-calendar-index-container p {
-  padding: 0;
+.calendar-index-container p {
+  padding: 0 90px 0 0;
   margin: 0;
   width: 20%;
   padding-right: 100px;

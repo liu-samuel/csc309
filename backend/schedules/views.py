@@ -313,7 +313,7 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
                 creation_data = []
 
                 # split into 30 minute increments
-                increments.append([start_time, end_time])
+                increments.append([start_time, end_time, availability_type])
 
             # validation: check for start/end time overlap
             try:
@@ -328,7 +328,7 @@ class EventAvailabilityAPIView(generics.CreateAPIView):
                             'start_time': increment[0],
                             'end_time': increment[1],
                             'event': event_id,
-                            'type': availability_type
+                            'type': increment[2]
                         }
 
                         serializer = AvailabilitySerializer(data=availability_data)
