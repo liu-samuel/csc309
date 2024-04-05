@@ -9,35 +9,20 @@ import {
 import axios from 'axios'
 import NavBar from '../../components/NavBar/NavBar.jsx'
 import Footer from '../../components/Footer/Footer.jsx'
+import {useAuth} from '../../contexts/AuthContext.js'
 
 const Contacts = () => {
     const [contacts, setContacts] = useState([])
-    const [token, setToken] = useState('')
     const [isPendingPage, setIsPendingPage] = useState(false)
     const [isSearch, setIsSearch] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
     const [requestMessage, setRequestMessage] = useState('')
     const [requestSuccess, setRequestSuccess] = useState(false)
-
-    useEffect(() => {
-        async function fetchToken() {
-            try {
-                const response = await axios.post(`${TOKEN_URL}`, {
-                    username: 'user2',
-                    password: 'password',
-                })
-                setToken(response.data.access)
-            } catch (error) {
-                console.error('Error fetching token: ', error)
-            }
-        }
-
-        fetchToken()
-    }, [])
+    const {user, logout} = useAuth();
 
     async function fetchContacts() {
         try {
-            if (!token) {
+            if (!user.token) {
                 return
             }
             const contactPageURL = isPendingPage
@@ -45,19 +30,19 @@ const Contacts = () => {
                 : CONTACTS_URL
             const response = await axios.get(`${contactPageURL}`, {
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${user.token}`,
                 },
             })
             if (!isPendingPage) {
                 setContacts(response.data)
             } else {
                 let usersData = []
-                for (let user of Object.values(response.data)) {
+                for (let request of Object.values(response.data)) {
                     const userResponse = await axios.get(
-                        `${USER_URL}${user.from_user}/`,
+                        `${USER_URL}${request.from_user}/`,
                         {
                             headers: {
-                                Authorization: `Bearer ${token}`,
+                                Authorization: `Bearer ${user.token}`,
                             },
                         }
                     )
@@ -72,13 +57,13 @@ const Contacts = () => {
 
     useEffect(() => {
         fetchContacts()
-    }, [token, isPendingPage])
+    }, [isPendingPage])
 
     const handleUnfriend = async email => {
         try {
             await axios.delete(`${CONTACTS_URL}?email=${email}`, {
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${user.token}`,
                 },
             })
             fetchContacts()
@@ -94,7 +79,7 @@ const Contacts = () => {
                 { email: email },
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        Authorization: `Bearer ${user.token}`,
                     },
                 }
             )
@@ -111,7 +96,7 @@ const Contacts = () => {
                 { email: searchTerm },
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        Authorization: `Bearer ${user.token}`,
                     },
                 }
             )
@@ -129,7 +114,7 @@ const Contacts = () => {
         try {
             await axios.delete(`${CONTACT_REQUEST_URL}?email=${email}`, {
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${user.token}`,
                 },
             })
 
@@ -154,7 +139,7 @@ const Contacts = () => {
             <NavBar />
             <div className='contact-navbar'>
                 <button
-                    className='active-page friends'
+                    className={isPendingPage ? 'friends' : 'active-page friends'}
                     onClick={() => {
                         setIsPendingPage(false)
                         setIsSearch(false)
@@ -163,7 +148,7 @@ const Contacts = () => {
                     Friends
                 </button>
                 <button
-                    className='pending'
+                    className={isPendingPage && !isSearch ? 'active-page pending' : 'pending'}
                     onClick={() => {
                         setIsPendingPage(true)
                         setIsSearch(false)
@@ -172,8 +157,11 @@ const Contacts = () => {
                     Pending
                 </button>
                 <button
-                    className='add-friend'
-                    onClick={() => setIsSearch(true)}
+                    onClick={() => {
+                        setIsSearch(true)
+                        setIsPendingPage(false)
+                    }}
+                    className={isSearch ? 'active-page add-friend' : 'add-friend'} 
                 >
                     Add Friend
                 </button>
@@ -195,7 +183,12 @@ const Contacts = () => {
                                     onKeyDown={handleKeyDown}
                                 />
                             </div>
+
+                            
                         </div>
+                        <button className='button-primary request-button' onClick={sendFriendRequest}>
+                                Send Request
+                        </button>
                         <div
                             className='request-message'
                             style={{ color: requestSuccess ? 'green' : 'red' }}
@@ -232,7 +225,7 @@ const Contacts = () => {
                                         Unfriend
                                     </button>
                                 ) : (
-                                    <div className='buttons'>
+                                    <div className='contact-buttons'>
                                         <button
                                             className='add'
                                             onClick={() =>

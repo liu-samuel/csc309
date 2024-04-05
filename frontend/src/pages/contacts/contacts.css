@@ -129,9 +129,7 @@ hr {
     color: white;
 }
 
-.active-page {
-    background-color: lightblue;
-}
+
 
 .add-friend {
     width: 20%;
@@ -147,6 +145,10 @@ hr {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.active-page {
+    background-color: lightblue;
 }
 
 button {
@@ -198,9 +200,14 @@ input {
     margin-bottom: 2rem;
 }
 
-.buttons {
+.contact-buttons {
     display: flex;
     margin-right: 2%;
+}
+
+.request-button {
+    margin: 0 auto;
+    margin-bottom: 1%;
 }
 
 .friends:hover {
@@ -225,6 +232,10 @@ input {
 
 .active-page:hover {
     background-color: #4d8dc9;
+}
+
+.friends:hover, .pending:hover, .add-friend:hover {
+    cursor: pointer;
 }
 
 .add:hover,
@@ -282,9 +293,7 @@ input {
     }
 }
 
-@media screen and (min-height: 800px) {
-    footer {
-        position: absolute;
-        bottom: 0;
-    }
+footer {
+    position: absolute;
+    bottom: 0;
 }
