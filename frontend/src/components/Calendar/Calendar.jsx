@@ -120,7 +120,9 @@ const Calendar = (props) => {
     nextWeekStartDate.setDate(nextWeekStartDate.getDate() + 4);
     const resetCalendar = resetCalendarItem(nextWeekStartDate);
     setStartDate(nextWeekStartDate);
-    updateCalendarItems(resetCalendar);
+    if (props.event_id) {
+      updateCalendarItems(resetCalendar);
+    }
   };
 
   const prevWeek = () => {
@@ -128,7 +130,9 @@ const Calendar = (props) => {
     prevWeekStartDate.setDate(prevWeekStartDate.getDate() - 4);
     const resetCalendar = resetCalendarItem(prevWeekStartDate);
     setStartDate(prevWeekStartDate);
-    updateCalendarItems(resetCalendar);
+    if (props.event_id) {
+      updateCalendarItems(resetCalendar);
+    }
   };
 
   const calculateDayDate = (startDate, dayIndex) => {
@@ -220,26 +224,28 @@ const Calendar = (props) => {
   );
 
   const updateCalendarItems = async (resetCalendar) => {
-    const response = await axios.get(`${EVENT_URL}${props.event_id}/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (response.statusText === "OK") {
-      let new_calendar = [...resetCalendar];
-      response.data.availabilities.forEach((availability) => {
-        if (availability.person == loggedInUserId) {
-          resetCalendar.forEach((item, i) => {
-            item.items.forEach((piece, j) => {
-              if (piece.time_start === availability.start_time.slice(0, 16)) {
-                new_calendar[i].items[j].availability = availability.type;
-              }
-            });
-          });
-        }
+    if (props.event_id) {
+      const response = await axios.get(`${EVENT_URL}${props.event_id}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      setCalendarItems(new_calendar);
+
+      if (response.statusText === "OK") {
+        let new_calendar = [...resetCalendar];
+        response.data.availabilities.forEach((availability) => {
+          if (availability.person == loggedInUserId) {
+            resetCalendar.forEach((item, i) => {
+              item.items.forEach((piece, j) => {
+                if (piece.time_start === availability.start_time.slice(0, 16)) {
+                  new_calendar[i].items[j].availability = availability.type;
+                }
+              });
+            });
+          }
+        });
+        setCalendarItems(new_calendar);
+      }
     }
   };
 
@@ -248,7 +254,8 @@ const Calendar = (props) => {
   }, []);
 
   useEffect(() => {
-    const getCalendarItems = async () => {
+      const getCalendarItems = async () => {
+        if (props.event_id) {
       const response = await axios.get(`${EVENT_URL}${props.event_id}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -275,6 +282,7 @@ const Calendar = (props) => {
     if (token !== "") {
       getCalendarItems();
     }
+  }
   }, [token]);
 
   return (
