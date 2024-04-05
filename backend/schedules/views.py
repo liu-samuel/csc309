@@ -27,38 +27,8 @@ class EventsListAPIView(generics.ListCreateAPIView):
         owner = request.query_params.get("owner")
         invitee = request.query_params.get("invitee")
         is_finalized = request.query_params.get("is_finalized")
-        
-        # validations
 
-        # check for missing params
-        missing_params = []
-        if not owner:
-            missing_params.append('owner')
-        if not invitee:
-            missing_params.append('invitee')
-        if not is_finalized:
-            missing_params.append('is_finalized')
-        if len(missing_params) > 0:
-            return Response({'error': f"Missing required parameter(s): {', '.join(missing_params)}"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        num_params = []
-        if not owner.isnumeric():
-            num_params.append('owner')
-        if not invitee.isnumeric():
-            num_params.append('invitee')
-        if len(num_params) > 0:
-            return Response({'error': f"Parameter(s) must be a number: {', '.join(num_params)}"}, status=status.HTTP_400_BAD_REQUEST)
-
-
-        # check that the current user is either the owner or the invitee
-        current_user = request.user
-        if (current_user.pk != int(owner)) and (current_user.pk != int(invitee)):
-            return Response({'error': 'Forbidden'}, status=status.HTTP_403_FORBIDDEN)
-        
-        # check that owner and invitee are different
-        if owner == invitee:
-            return Response({'error': 'owner and invitee must be different'}, status=status.HTTP_400_BAD_REQUEST)
-
+        # Convert is_finalized to boolean
         if is_finalized:
             if is_finalized.lower() == "false":
                 is_finalized = False
@@ -66,12 +36,33 @@ class EventsListAPIView(generics.ListCreateAPIView):
                 is_finalized = True
             else:
                 return Response({'error': 'is_finalized must be a boolean value'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
+        # Build the filter arguments based on provided query parameters
+        filter_args = {}
+        if owner:
+            if not owner.isnumeric():
+                return Response({'error': "Parameter 'owner' must be a number"}, status=status.HTTP_400_BAD_REQUEST)
+            filter_args['owner__pk'] = owner
+
+        if invitee:
+            if not invitee.isnumeric():
+                return Response({'error': "Parameter 'invitee' must be a number"}, status=status.HTTP_400_BAD_REQUEST)
+            filter_args['invitee__pk'] = invitee
+
+        if is_finalized is not None:
+            filter_args['is_finalized'] = is_finalized
+
+        # Ensure at least one of owner or invitee is provided
+        if not owner and not invitee:
+            return Response({'error': 'At least one of owner or invitee must be provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Query events based on filter arguments
         try:
-            events = Event.objects.filter(owner__pk=owner, invitee__pk=invitee, is_finalized=bool(is_finalized))
+            events = Event.objects.filter(**filter_args)
         except Exception:
             return Response({'error': 'Cannot get events'}, status=status.HTTP_404_NOT_FOUND)
 
+        # Serialize and return the events
         try:
             events_response = [EventSerializer(event).data for event in events]
             return Response({'events': events_response}, status=status.HTTP_200_OK)
@@ -130,7 +121,6 @@ class EventsListAPIView(generics.ListCreateAPIView):
             "is_finalized": is_finalized,
             "selected_time": selected_time
         }
-        print(event_data)
 
         serializer = EventSerializer(data=event_data)
         if serializer.is_valid():
@@ -139,11 +129,9 @@ class EventsListAPIView(generics.ListCreateAPIView):
             try:
                 send_request_email(owner=owner, invitee=invitee_user, event=event)
             except:
-                print("here")
                 return Response({'error': 'Could not send email'}, status=status.HTTP_400_BAD_REQUEST)
             
             return response
-        print("hereafter")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def send_request_email(owner, invitee, event):
