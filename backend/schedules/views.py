@@ -121,7 +121,6 @@ class EventsListAPIView(generics.ListCreateAPIView):
             "is_finalized": is_finalized,
             "selected_time": selected_time
         }
-        print(event_data)
 
         serializer = EventSerializer(data=event_data)
         if serializer.is_valid():
@@ -130,11 +129,9 @@ class EventsListAPIView(generics.ListCreateAPIView):
             try:
                 send_request_email(owner=owner, invitee=invitee_user, event=event)
             except:
-                print("here")
                 return Response({'error': 'Could not send email'}, status=status.HTTP_400_BAD_REQUEST)
             
             return response
-        print("hereafter")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def send_request_email(owner, invitee, event):
