@@ -253,14 +253,6 @@ h3 {
     }
 }
 
-/* @media screen and (min-height: 800px) {
-    footer {
-        position: absolute;
-        bottom: 0;
-    }
-
-} */
-
 .calendar {
     height: 100%;
     width: 100%;
