@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from 'react'
+import { React, useState, useRef } from 'react'
 import './NewMeeting.css'
 import axios from 'axios'
 import NavBar from '../../components/NavBar/NavBar'
@@ -8,6 +8,7 @@ import { EVENT_URL, TOKEN_URL, USER_URL } from '../../constants'
 import { useAuth } from '../../contexts/AuthContext'
 
 const NewMeeting = () => {
+  const childRef = useRef();
     const [eventName, setEventName] = useState('')
     const [invitee, setInvitee] = useState('')
     const [deadline, setDeadline] = useState('')
@@ -32,6 +33,8 @@ const NewMeeting = () => {
             })
             setInviteMessage(response.data.message)
             setInviteSuccess(true)
+            // await addAvailability(user.email);
+
         } catch (error) {
             console.error('Error creating new event: ', error)
             setInviteMessage(error.response.data.error)
@@ -59,7 +62,7 @@ const NewMeeting = () => {
                 <h1 className='title'>
                     New Meeting With <span className='attending-name'>{user.firstName} {user.lastName}</span>
                 </h1>
-                <Calendar />
+                <Calendar ref={childRef}/>
                 <div className='calendar-mobile-buttons'>
                     <button className='button-primary calendar-button'>
                         Previous Day
@@ -107,7 +110,7 @@ const NewMeeting = () => {
                 <div className='submit-button'>
                     <button
                         className='button-primary'
-                        onClick={sendMeetingInvite}
+                        onClick={() => {sendMeetingInvite(); childRef.current.addAvailibility(user.email)}}
                     >
                         Send Invite
                     </button>
@@ -122,5 +125,6 @@ const NewMeeting = () => {
         </div>
     )
 }
+
 
 export default NewMeeting

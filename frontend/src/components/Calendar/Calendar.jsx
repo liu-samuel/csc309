@@ -1,23 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, forwardRef } from "react";
 import "./Calendar.css";
 import axios from "axios";
 import { EVENT_AVAILABILITY_URL, EVENT_URL, TOKEN_URL } from "../../constants";
+import { useAuth } from "../../contexts/AuthContext";
 
-const Calendar = (props) => {
-  const fetchToken = async () => {
-    try {
-      const response = await axios.post(`${TOKEN_URL}`, {
-        username: "user1",
-        password: "password",
-      });
-      setToken(response.data.access);
-      return response.data.access;
-    } catch (error) {
-      console.error("Error fetching token: ", error);
-    }
-  };
+const Calendar = forwardRef((props, ref) => {
+  
 
-  const setAvailability = async (email, token) => {
+  const setAvailability = async (email) => {
     try {
       for (var i = 0; i < calendarItems[0].items.length; i++) {
         const end_date = new Date(calendarItems[0].items[i].time_start);
@@ -33,7 +23,7 @@ const Calendar = (props) => {
           `${EVENT_AVAILABILITY_URL(props.event_id)}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${user.token}`,
               "Content-Type": "application/json",
             },
             data: body,
@@ -45,7 +35,17 @@ const Calendar = (props) => {
         }
       }
 
-      const body_request = [];
+      await addAvailibility(email);
+
+      
+      // return response.data.user_id;
+    } catch (error) {
+      console.error("Error adding availability: ", error);
+    }
+  };
+
+  const addAvailibility = async (email) => {
+    const body_request = [];
       calendarItems.forEach((row) => {
         row.items.forEach(async (cell) => {
           if (cell.availability !== "") {
@@ -77,17 +77,14 @@ const Calendar = (props) => {
         availability_data,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${user.token}`,
             "Content-Type": "application/json",
           },
         }
       );
+  }
+  
 
-      // return response.data.user_id;
-    } catch (error) {
-      console.error("Error adding availability: ", error);
-    }
-  };
 
   const resetCalendarItem = (new_date) => {
     return Array.from({ length: 48 }, (_, i) => {
@@ -186,16 +183,16 @@ const Calendar = (props) => {
   const updateAvailabilities = (e) => {
     // delete all availabilities for the days
     // add availabilities
-    if (token !== "") {
-      setAvailability(loggedInEmail, token);
+    if (user.token !== "") {
+      setAvailability(loggedInEmail);
       return;
     }
     // TODO: handle error with token
   };
 
   const [startDate, setStartDate] = useState(new Date());
-  const [token, setToken] = useState("");
   const [loggedInEmail, setLoggedInEmail] = useState("user1@user1.com");
+  const {user, logout} = useAuth();
   const [loggedInUserId, setLoggedInUserId] = useState(1);
   const [calendarItems, setCalendarItems] = useState(
     Array.from({ length: 48 }, (_, i) => {
@@ -227,7 +224,7 @@ const Calendar = (props) => {
     if (props.event_id) {
       const response = await axios.get(`${EVENT_URL}${props.event_id}/`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${user.token}`,
         },
       });
 
@@ -250,15 +247,11 @@ const Calendar = (props) => {
   };
 
   useEffect(() => {
-    fetchToken();
-  }, []);
-
-  useEffect(() => {
       const getCalendarItems = async () => {
         if (props.event_id) {
       const response = await axios.get(`${EVENT_URL}${props.event_id}/`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${user.token}`,
         },
       });
 
@@ -279,11 +272,11 @@ const Calendar = (props) => {
       }
     };
 
-    if (token !== "") {
+    if (user.token !== "") {
       getCalendarItems();
     }
   }
-  }, [token]);
+  }, [user.token]);
 
   return (
     <div className="calendar">
@@ -386,6 +379,7 @@ const Calendar = (props) => {
       </div>
     </div>
   );
-};
+});
+
 
 export default Calendar;
