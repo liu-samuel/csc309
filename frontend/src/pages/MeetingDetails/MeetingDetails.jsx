@@ -5,10 +5,11 @@ import axios from "axios";
 import NavBar from "../../components/NavBar/NavBar";
 import Footer from "../../components/Footer/Footer";
 import Calendar from "../../components/Calendar/Calendar";
+import { useAuth } from "../../contexts/AuthContext";
 import { EVENT_URL, TOKEN_URL, USER_URL } from "../../constants";
 
 const MeetingDetails = () => {
-  const [token, setToken] = useState("");
+  const {user, logout} = useAuth();
   const [eventName, setEventName] = useState("");
   const [invitee, setInvitee] = useState("");
   const [deadline, setDeadline] = useState("");
@@ -42,27 +43,11 @@ const MeetingDetails = () => {
   }
 
   useEffect(() => {
-    async function fetchToken() {
-      try {
-        const response = await axios.post(`${TOKEN_URL}`, {
-          username: "user1",
-          password: "password",
-        });
-        setToken(response.data.access);
-      } catch (error) {
-        console.error("Error fetching token: ", error);
-      }
-    }
-
-    fetchToken();
-  }, []);
-
-  useEffect(() => {
     async function updateEventDetails() {
       try {
         const response = await axios.get(`${EVENT_URL}${event_id}/`, {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${user.token}`,
           },
         });
 
@@ -76,13 +61,13 @@ const MeetingDetails = () => {
     }
 
     updateEventDetails();
-  }, [token]);
+  }, []);
 
   async function getIDFromEmail(email) {
     try {
       const response = await axios.get(`${USER_URL}?email=${email}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${user.token}`,
         },
       });
       return response.data.user_id;

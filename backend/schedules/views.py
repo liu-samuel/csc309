@@ -127,7 +127,12 @@ class EventsListAPIView(generics.ListCreateAPIView):
         serializer = EventSerializer(data=event_data)
         if serializer.is_valid():
             event = serializer.save()
-            response = Response({'message': 'Event Invite Sent'}, status=status.HTTP_201_CREATED)
+            event_serializer = EventSerializer(event)
+            response_data = {
+                'message': 'Event Invite Sent',
+                'event': event_serializer.data
+            }
+            response = Response(response_data, status=status.HTTP_201_CREATED)
             try:
                 send_request_email(owner=owner, invitee=invitee_user, event=event)
             except:
