@@ -74,21 +74,20 @@ const Calendar = forwardRef((props, ref) => {
         availabilities: body_request,
       });
       
-      console.log("inviteID: ", inviteID);
-      console.log("props: ", props.event_id);
       const eventID = inviteID ? inviteID : props.event_id;
-      console.log(eventID)
+      if (body_request.length > 0) {
+        await axios.post(
+          `${EVENT_AVAILABILITY_URL(eventID)}`,
+          availability_data,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      }
 
-      await axios.post(
-        `${EVENT_AVAILABILITY_URL(eventID)}`,
-        availability_data,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
   }
 
   useImperativeHandle(ref, () => ({

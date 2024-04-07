@@ -159,6 +159,7 @@ const Home = () => {
             const proposedMeetingsJson = await proposedMeetingsRes.json()
             const proposedMeetings = proposedMeetingsJson.events.map(
                 async event => {
+                    console.log(event.deadline.toLocaleString());
                     // Assuming the invitee is the other user in this context
                     const otherUserName = await fetchUserDetails(event.invitee)
                     return {
@@ -203,8 +204,8 @@ const Home = () => {
                                     <span className='due'>
                                         due{' '}
                                         {new Date(
-                                            request.deadline
-                                        ).toLocaleString()}
+                                            new Date(request.deadline).getTime() + 5 * 60 * 60 * 1000)
+                                            .toLocaleString()}
                                     </span>
                                     <button
                                         className='add-availability button-primary'
@@ -239,8 +240,8 @@ const Home = () => {
                                     <span className='due'>
                                         due{' '}
                                         {new Date(
-                                            meeting.selected_time
-                                        ).toLocaleString()}
+                                            new Date(meeting.deadline).getTime() + 5 * 60 * 60 * 1000)
+                                            .toLocaleString()}
                                     </span>
                                     <button
                                         className='add-availability button-secondary'
