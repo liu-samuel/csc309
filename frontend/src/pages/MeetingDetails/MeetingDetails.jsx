@@ -14,6 +14,10 @@ const MeetingDetails = () => {
   const [invitee, setInvitee] = useState("");
   const [deadline, setDeadline] = useState("");
   const [agenda, setAgenda] = useState("");
+  const [scheduling, setScehduling] = useState(false);
+  const [selected, setSelected] = useState(false);
+  const [scheduled, setScheduled] = useState(false);
+  const [eventTime, setEventTime] = useState("");
 
   const { event_id } = useParams();
 
@@ -34,7 +38,7 @@ const MeetingDetails = () => {
       "December",
     ];
     const year = str.slice(0, 4);
-    const month = str.slice(5, 7);
+    const month = Number(str.slice(5, 7));
     const day = str.slice(8, 10);
     const hour = str.slice(11, 13);
     const minute = str.slice(14, 16);
@@ -54,6 +58,8 @@ const MeetingDetails = () => {
         setEventName(response.data.name);
         setDeadline(convertStringToDate(response.data.deadline.slice(0, 16)));
         setAgenda(response.data.agenda);
+        setScheduled(response.data.is_finalized);
+        setEventTime(response.data.selected_time);
         console.log(response);
       } catch (error) {
         console.error("Error getting event details", error);
@@ -80,16 +86,28 @@ const MeetingDetails = () => {
     <div className="md-full-page">
       <NavBar />
       <div className="md-meeting-details-content">
+        {(scheduling && !selected) ? (
+        <div className="md-notification-wrapper">
+          <div className="md-notification">
+            <svg className="md-alert" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+              {/* <!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--> */}
+            <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>
+            <p>Click on a time to schedule a meeting</p>
+          </div>
+        </div>) : <></>
+        }
         <h1 className="md-title">
           Meeting Details: <span className="md-attending-name">{eventName}</span>
         </h1>
-        <Calendar editable event_id={event_id} />
-        {/* <div className="md-calendar-mobile-buttons">
-          <button className="md-button-primary md-calendar-button">
-            Previous Day
-          </button>
-          <button className="md-button-primary md-calendar-button">Next Day</button>
-        </div> */}
+        {scheduled ?
+        <div className="md-scheduled-meeting"> 
+        <h2>You have already scheduled this event for:
+        </h2><br/>
+        <h2 className="md-attending-name">{convertStringToDate(eventTime)}</h2>
+         <div className="md-button md-button-primary" onClick={() => {setScheduled(false)}}>Reschedule?</div>
+        </div>
+        : 
+        <><Calendar editable event_id={event_id} scheduling={scheduling} setSelected={setSelected} setScheduled={setScheduled} />
 
         <div className="md-bottom-wrapper">
           <div className="md-deadline">
@@ -97,8 +115,8 @@ const MeetingDetails = () => {
             <span className="md-deadline-text">{deadline}</span>
           </div>
 
-          <div className="md-button md-button-primary">Schedule Meeting</div>
-        </div>
+          <div className="md-button md-button-primary" onClick={() => {setScehduling(!scheduling)}}>Schedule Meeting</div>
+        </div></>}
 
         <div className="meeting-agenda-container">
           <div className="agenda-title">Agenda</div>

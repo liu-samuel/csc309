@@ -22,6 +22,7 @@ function useWindowSize() {
 const Calendar = forwardRef((props, ref) => {
   const [width, _] = useWindowSize();
   const [calendarColumns, setCalendarColumns] = useState(4);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
     const updateCalendarColumns = () => {
@@ -207,6 +208,13 @@ const Calendar = forwardRef((props, ref) => {
   };
 
   const handleAvailabilityChange = (i, j) => {
+    if (props.scheduling) {
+      setSelectedEvent(calendarItems[i].items[j]);
+      props.setSelected(true);
+      console.log("event", calendarItems[i].items[j]);
+      return;
+    }
+  
     let previous_calendar = [...calendarItems];
 
     const old_avail = previous_calendar[i].items[j].availability;
@@ -220,6 +228,13 @@ const Calendar = forwardRef((props, ref) => {
 
     setCalendarItems(previous_calendar);
   };
+
+  useEffect(() => {
+    if (!props.scheduling) {
+      props.setSelected(false)
+      setSelectedEvent(null)
+    }
+  }, [props.scheduling])
 
   const updateAvailabilities = (e) => {
     // delete all availabilities for the days
@@ -296,6 +311,31 @@ const Calendar = forwardRef((props, ref) => {
     }
   };
 
+  function convertStringToDate(str) {
+    const map = [
+      "",
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    const year = str.slice(0, 4);
+    const month = Number(str.slice(5, 7));
+    const day = str.slice(8, 10);
+    const hour = str.slice(11, 13);
+    const minute = str.slice(14, 16);
+
+    return `${map[month]} ${day}, ${year}, ${hour}:${minute}`;
+  }
+
   useEffect(() => {
       const getCalendarItems = async () => {
         if (props.event_id) {
@@ -336,6 +376,30 @@ const Calendar = forwardRef((props, ref) => {
     }
   }, [ref]);
 
+  const scheduleEvent = async () => {
+    try {
+      const schedulingData = {
+        selected_time: selectedEvent.time_start,
+        is_finalized: true,
+      }
+      await axios.patch(
+        `${EVENT_URL}${props.event_id}/`,
+        schedulingData,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      props.setScheduled(true);
+    }
+    catch (error) {
+      console.log("Error scheduling event", error);
+    }
+  }
+
   return (
     <>
     <div className="md-calendar-mobile-buttons">
@@ -361,59 +425,67 @@ const Calendar = forwardRef((props, ref) => {
           </div>
         </div>
       </div>
-      <div className="calendar-container">
-        <div className="week-buttons">
-          {calendarColumns > 1 ?
-          (<><button onClick={prevWeek} className="button-primary prev-week">
-            Previous Week
-          </button>
-          <button onClick={nextWeek} className="button-primary prev-week">
-            Next Week
-          </button></>)
-          : (<></>)}
 
-          {props.editable ? (
-            <button onClick={updateAvailabilities} className="button-primary">
-              Save Availability
+      {selectedEvent ? (<>
+        <h1>You have selected the following date/time:<br/><span>{convertStringToDate(selectedEvent.time_start)}</span> <br/> (30 minute meeting)</h1>
+        <button className="md-button-primary md-calendar-button" onClick={scheduleEvent} >Schedule Event</button>
+        <button className="md-button-primary md-calendar-button" onClick={() => {props.setSelected(false); setSelectedEvent(null)}}>Cancel</button></>)
+        :
+        <div className="calendar-container">
+          <div className="week-buttons">
+            {calendarColumns > 1 ?
+            (<><button onClick={prevWeek} className="button-primary prev-week">
+              Previous Week
             </button>
-          ) : (
-            <></>
-          )}
+            <button onClick={nextWeek} className="button-primary prev-week">
+              Next Week
+            </button></>)
+            : (<></>)}
+
+            {props.editable ? (
+              <button onClick={updateAvailabilities} className="button-primary">
+                Save Availability
+              </button>
+            ) : (
+              <></>
+            )}
+          </div>
+          <table>
+            <thead>{renderWeekdays()}</thead>
+            <tbody>
+              {calendarItems.map((row, index) => (
+                <>
+                {/* {console.log(row.items[0])} */}
+                  <tr key={row.key}>
+                    <td className="time">{row.time}</td>
+                    {Array.from({length: calendarColumns}, (_, i) => (
+                      <td
+                        onClick={() => {
+                          handleAvailabilityChange(index, i);
+                        }}
+                        style={
+                          row.items[i].other_availability && row.items[i].availability
+                            ? { backgroundColor: "#096560" }
+                            : row.items[i].availability === "preferred"
+                            ? { backgroundColor: "#1400ff" }
+                            : row.items[i].availability === "available"
+                            ? { backgroundColor: "#03a200" }
+                            : row.items[i].other_availability === "preferred"
+                            ? { backgroundColor: "#1400ff", opacity: 0.5 }
+                            : row.items[i].other_availability === "available"
+                            ? { backgroundColor: "#03a200", opacity: 0.5 }
+                            : { backgroundColor: "transparent" }
+                        }
+                      ></td>
+                    ))}
+                  </tr>
+                </>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <table>
-          <thead>{renderWeekdays()}</thead>
-          <tbody>
-            {calendarItems.map((row, index) => (
-              <>
-              {/* {console.log(row.items[0])} */}
-                <tr key={row.key}>
-                  <td className="time">{row.time}</td>
-                  {Array.from({length: calendarColumns}, (_, i) => (
-                    <td
-                      onClick={() => {
-                        handleAvailabilityChange(index, i);
-                      }}
-                      style={
-                        row.items[i].other_availability && row.items[i].availability
-                          ? { backgroundColor: "#096560" }
-                          : row.items[i].availability === "preferred"
-                          ? { backgroundColor: "#1400ff" }
-                          : row.items[i].availability === "available"
-                          ? { backgroundColor: "#03a200" }
-                          : row.items[i].other_availability === "preferred"
-                          ? { backgroundColor: "#1400ff", opacity: 0.5 }
-                          : row.items[i].other_availability === "available"
-                          ? { backgroundColor: "#03a200", opacity: 0.5 }
-                          : { backgroundColor: "transparent" }
-                      }
-                    ></td>
-                  ))}
-                </tr>
-              </>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      }
+
     </div>
     </>
   );
