@@ -289,7 +289,7 @@ const Calendar = forwardRef((props, ref) => {
       getCalendarItems();
     }
   }
-  }, [user.token]);
+  }, []);
 
   return (
     <div className="calendar">
