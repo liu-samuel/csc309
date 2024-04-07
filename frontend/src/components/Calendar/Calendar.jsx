@@ -1,11 +1,39 @@
-import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
+import React, { useEffect, useState, forwardRef, useImperativeHandle, useLayoutEffect } from "react";
 import "./Calendar.css";
 import axios from "axios";
 import { EVENT_AVAILABILITY_URL, EVENT_URL, TOKEN_URL } from "../../constants";
 import { useAuth } from "../../contexts/AuthContext";
 
+function useWindowSize() {
+  const [size, setSize] = useState([0, 0]);
+  useLayoutEffect(() => {
+    function updateSize() {
+      setSize([window.innerWidth, window.innerHeight]);
+    }
+    window.addEventListener('resize', updateSize);
+    updateSize();
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+  return size;
+}
+
+
+
 const Calendar = forwardRef((props, ref) => {
-  
+  const [width, _] = useWindowSize();
+  const [calendarColumns, setCalendarColumns] = useState(4);
+
+  useEffect(() => {
+    const updateCalendarColumns = () => {
+      if (width <= 900) {
+        setCalendarColumns(1);
+      } else {
+        setCalendarColumns(4);
+      }
+    }
+
+    updateCalendarColumns();
+  }, [width]);
 
   const setAvailability = async (email) => {
     try {
@@ -106,7 +134,7 @@ const Calendar = forwardRef((props, ref) => {
         time:
           String(Math.floor(i / 2)).padStart(2, "0") +
           (i % 2 == 0 ? ":00" : ":30"),
-        items: Array.from({ length: 4 }, (_, j) => {
+        items: Array.from({ length: calendarColumns }, (_, j) => {
           return {
             time_start:
               String(
@@ -127,7 +155,7 @@ const Calendar = forwardRef((props, ref) => {
 
   const nextWeek = () => {
     const nextWeekStartDate = new Date(startDate);
-    nextWeekStartDate.setDate(nextWeekStartDate.getDate() + 4);
+    nextWeekStartDate.setDate(nextWeekStartDate.getDate() + calendarColumns);
     const resetCalendar = resetCalendarItem(nextWeekStartDate);
     setStartDate(nextWeekStartDate);
     if (props.event_id) {
@@ -137,7 +165,7 @@ const Calendar = forwardRef((props, ref) => {
 
   const prevWeek = () => {
     const prevWeekStartDate = new Date(startDate);
-    prevWeekStartDate.setDate(prevWeekStartDate.getDate() - 4);
+    prevWeekStartDate.setDate(prevWeekStartDate.getDate() - calendarColumns);
     const resetCalendar = resetCalendarItem(prevWeekStartDate);
     setStartDate(prevWeekStartDate);
     if (props.event_id) {
@@ -163,7 +191,7 @@ const Calendar = forwardRef((props, ref) => {
     ];
     const startDayIndex = startDate.getDay();
 
-    const weekdayElements = Array.from({ length: 4 }, (_, i) => {
+    const weekdayElements = Array.from({ length: calendarColumns }, (_, i) => {
       const weekdayIndex = (startDayIndex + i) % 7;
       const day = weekdays[weekdayIndex];
 
@@ -215,7 +243,7 @@ const Calendar = forwardRef((props, ref) => {
         time:
           String(Math.floor(i / 2)).padStart(2, "0") +
           (i % 2 == 0 ? ":00" : ":30"),
-        items: Array.from({ length: 4 }, (_, j) => {
+        items: Array.from({ length: calendarColumns }, (_, j) => {
           return {
             time_start:
               String(
@@ -312,7 +340,8 @@ const Calendar = forwardRef((props, ref) => {
     <div className="calendar">
       <div className="calendar-header">
         <h2>
-          {calculateDayDate(startDate, 0)} - {calculateDayDate(startDate, 3)}
+          
+          {calendarColumns > 1 ? (calculateDayDate(startDate, 0) + " - " + calculateDayDate(startDate, calendarColumns - 1)) : calculateDayDate(startDate, 0) }
         </h2>
         <div className="calendar-color-index">
           <div className="calendar-index-container">
@@ -328,10 +357,10 @@ const Calendar = forwardRef((props, ref) => {
       <div className="calendar-container">
         <div className="week-buttons">
           <button onClick={prevWeek} className="button-primary prev-week">
-            Previous Week
+            Previous {calendarColumns > 1 ? "Week" : "Day"}
           </button>
           <button onClick={nextWeek} className="button-primary prev-week">
-            Next Week
+            Next {calendarColumns > 1 ? "Week" : "Day"}
           </button>
 
           {props.editable ? (
@@ -350,7 +379,7 @@ const Calendar = forwardRef((props, ref) => {
               {/* {console.log(row.items[0])} */}
                 <tr key={row.key}>
                   <td className="time">{row.time}</td>
-                  {Array.from({length: 4}, (_, i) => (
+                  {Array.from({length: calendarColumns}, (_, i) => (
                     <td
                       onClick={() => {
                         handleAvailabilityChange(index, i);

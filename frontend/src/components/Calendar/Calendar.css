@@ -238,7 +238,6 @@ td:nth-child(2) {
 .calendar-available-box,
 .calendar-preferred-box {
     width: 100%;
-    height: 100%;
     display: block;
 }
 
