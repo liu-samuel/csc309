@@ -17,7 +17,7 @@ const NewMeeting = () => {
     const [inviteSuccess, setInviteSuccess] = useState(false);
     const {user, logout} = useAuth();
 
-    async function sendMeetingInvite() {
+    async function sendMeetingInvite(email) {
         try {
             let inviteeID = await getIDFromEmail(invitee)
             const postData = {
@@ -33,7 +33,7 @@ const NewMeeting = () => {
             })
             setInviteMessage(response.data.message)
             setInviteSuccess(true)
-            // await addAvailability(user.email);
+            await childRef.current.addAvailability(email, response.data.event.id);
 
         } catch (error) {
             console.error('Error creating new event: ', error)
@@ -110,7 +110,7 @@ const NewMeeting = () => {
                 <div className='submit-button'>
                     <button
                         className='button-primary'
-                        onClick={() => {sendMeetingInvite(); childRef.current.addAvailibility(user.email)}}
+                        onClick={async () => {await sendMeetingInvite(user.email);}}
                     >
                         Send Invite
                     </button>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, forwardRef } from "react";
+import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import "./Calendar.css";
 import axios from "axios";
 import { EVENT_AVAILABILITY_URL, EVENT_URL, TOKEN_URL } from "../../constants";
@@ -35,7 +35,7 @@ const Calendar = forwardRef((props, ref) => {
         }
       }
 
-      await addAvailibility(email);
+      await addAvailability(email);
 
       
       // return response.data.user_id;
@@ -44,7 +44,9 @@ const Calendar = forwardRef((props, ref) => {
     }
   };
 
-  const addAvailibility = async (email) => {
+
+  
+  const addAvailability = async (email, inviteID) => {
     const body_request = [];
       calendarItems.forEach((row) => {
         row.items.forEach(async (cell) => {
@@ -71,9 +73,14 @@ const Calendar = forwardRef((props, ref) => {
       const availability_data = JSON.stringify({
         availabilities: body_request,
       });
+      
+      console.log("inviteID: ", inviteID);
+      console.log("props: ", props.event_id);
+      const eventID = inviteID ? inviteID : props.event_id;
+      console.log(eventID)
 
       await axios.post(
-        `${EVENT_AVAILABILITY_URL(props.event_id)}`,
+        `${EVENT_AVAILABILITY_URL(eventID)}`,
         availability_data,
         {
           headers: {
@@ -83,6 +90,12 @@ const Calendar = forwardRef((props, ref) => {
         }
       );
   }
+
+  useImperativeHandle(ref, () => ({
+
+    addAvailability: addAvailability
+
+  }));
   
 
 
