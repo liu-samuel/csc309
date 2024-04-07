@@ -159,7 +159,6 @@ const Home = () => {
             const proposedMeetingsJson = await proposedMeetingsRes.json()
             const proposedMeetings = proposedMeetingsJson.events.map(
                 async event => {
-                    console.log(event.deadline.toLocaleString());
                     // Assuming the invitee is the other user in this context
                     const otherUserName = await fetchUserDetails(event.invitee)
                     return {
