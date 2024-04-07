@@ -18,7 +18,7 @@ const Contacts = () => {
     const [searchTerm, setSearchTerm] = useState('')
     const [requestMessage, setRequestMessage] = useState('')
     const [requestSuccess, setRequestSuccess] = useState(false)
-    const {user, logout} = useAuth();
+    const {user} = useAuth();
 
     async function fetchContacts() {
         try {

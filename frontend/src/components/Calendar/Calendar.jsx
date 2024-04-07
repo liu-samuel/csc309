@@ -205,7 +205,7 @@ const Calendar = forwardRef((props, ref) => {
 
   const [startDate, setStartDate] = useState(new Date());
   const [loggedInEmail, setLoggedInEmail] = useState("user1@user1.com");
-  const {user, logout} = useAuth();
+  const {user} = useAuth();
   const [loggedInUserId, setLoggedInUserId] = useState(1);
   const [calendarItems, setCalendarItems] = useState(
     Array.from({ length: 48 }, (_, i) => {

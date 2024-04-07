@@ -15,7 +15,7 @@ const NewMeeting = () => {
     const [agenda, setAgenda] = useState('')
     const [inviteMessage, setInviteMessage] = useState('')
     const [inviteSuccess, setInviteSuccess] = useState(false);
-    const {user, logout} = useAuth();
+    const {user} = useAuth();
 
     async function sendMeetingInvite(email) {
         try {
