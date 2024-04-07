@@ -118,6 +118,7 @@ const Calendar = forwardRef((props, ref) => {
               String(Math.floor(i / 2)).padStart(2, "0") +
               (i % 2 == 0 ? ":00" : ":30"),
             availability: "",
+            other_availability: "",
           };
         }),
       };
@@ -226,6 +227,7 @@ const Calendar = forwardRef((props, ref) => {
               String(Math.floor(i / 2)).padStart(2, "0") +
               (i % 2 == 0 ? ":00" : ":30"),
             availability: "",
+            other_availability: "",
           };
         }),
       };
@@ -248,6 +250,14 @@ const Calendar = forwardRef((props, ref) => {
               item.items.forEach((piece, j) => {
                 if (piece.time_start === availability.start_time.slice(0, 16)) {
                   new_calendar[i].items[j].availability = availability.type;
+                }
+              });
+            });
+          } else {
+            resetCalendar.forEach((item, i) => {
+              item.items.forEach((piece, j) => {
+                if (piece.time_start === availability.start_time.slice(0, 16)) {
+                  new_calendar[i].items[j].other_availability = availability.type;
                 }
               });
             });
@@ -278,9 +288,18 @@ const Calendar = forwardRef((props, ref) => {
                     }
                   });
                 });
+              } else {
+                calendarItems.forEach((item, i) => {
+                  item.items.forEach((piece, j) => {
+                    if (piece.time_start === availability.start_time.slice(0, 16)) {
+                      new_calendar[i].items[j].other_availability = availability.type;
+                    }
+                  });
+                });
               }
             });
             setCalendarItems(new_calendar);
+            console.log(new_calendar);
           }
         };
     }
@@ -328,60 +347,30 @@ const Calendar = forwardRef((props, ref) => {
           <tbody>
             {calendarItems.map((row, index) => (
               <>
+              {/* {console.log(row.items[0])} */}
                 <tr key={row.key}>
                   <td className="time">{row.time}</td>
-                  <td
-                    onClick={() => {
-                      handleAvailabilityChange(index, 0);
-                    }}
-                    data-block={row.items[0].time_start}
-                    style={
-                      row.items[0].availability === "preferred"
-                        ? { backgroundColor: "#1400ff" }
-                        : row.items[0].availability === "available"
-                        ? { backgroundColor: "#03a200" }
-                        : { backgroundColor: "transparent" }
-                    }
-                  ></td>
-                  <td
-                    onClick={() => {
-                      handleAvailabilityChange(index, 1);
-                    }}
-                    data-block={row.items[1].time_start}
-                    style={
-                      row.items[1].availability === "preferred"
-                        ? { backgroundColor: "#1400ff" }
-                        : row.items[1].availability === "available"
-                        ? { backgroundColor: "#03a200" }
-                        : { backgroundColor: "transparent" }
-                    }
-                  ></td>
-                  <td
-                    onClick={() => {
-                      handleAvailabilityChange(index, 2);
-                    }}
-                    data-block={row.items[2].time_start}
-                    style={
-                      row.items[2].availability === "preferred"
-                        ? { backgroundColor: "#1400ff" }
-                        : row.items[2].availability === "available"
-                        ? { backgroundColor: "#03a200" }
-                        : { backgroundColor: "transparent" }
-                    }
-                  ></td>
-                  <td
-                    onClick={() => {
-                      handleAvailabilityChange(index, 3);
-                    }}
-                    data-block={row.items[3].time_start}
-                    style={
-                      row.items[3].availability === "preferred"
-                        ? { backgroundColor: "#1400ff" }
-                        : row.items[3].availability === "available"
-                        ? { backgroundColor: "#03a200" }
-                        : { backgroundColor: "transparent" }
-                    }
-                  ></td>
+                  {Array.from({length: 4}, (_, i) => (
+                    <td
+                      onClick={() => {
+                        handleAvailabilityChange(index, i);
+                      }}
+                      data-block={row.items[i].time_start}
+                      style={
+                        row.items[i].other_availability && row.items[i].availability
+                          ? { backgroundColor: "#096560" }
+                          : row.items[i].availability === "preferred"
+                          ? { backgroundColor: "#1400ff" }
+                          : row.items[i].availability === "available"
+                          ? { backgroundColor: "#03a200" }
+                          : row.items[i].other_availability === "preferred"
+                          ? { backgroundColor: "#1400ff", opacity: 0.5 }
+                          : row.items[i].other_availability === "available"
+                          ? { backgroundColor: "#03a200", opacity: 0.5 }
+                          : { backgroundColor: "transparent" }
+                      }
+                    ></td>
+                  ))}
                 </tr>
               </>
             ))}
