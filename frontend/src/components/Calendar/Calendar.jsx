@@ -261,34 +261,33 @@ const Calendar = forwardRef((props, ref) => {
   useEffect(() => {
       const getCalendarItems = async () => {
         if (props.event_id) {
-      const response = await axios.get(`${EVENT_URL}${props.event_id}/`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
+          const response = await axios.get(`${EVENT_URL}${props.event_id}/`, {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          });
 
-      if (response.statusText === "OK") {
-        let new_calendar = [...calendarItems];
-        response.data.availabilities.forEach((availability) => {
-          if (availability.person == loggedInUserId) {
-            calendarItems.forEach((item, i) => {
-              item.items.forEach((piece, j) => {
-                if (piece.time_start === availability.start_time.slice(0, 16)) {
-                  new_calendar[i].items[j].availability = availability.type;
-                }
-              });
+          if (response.statusText === "OK") {
+            let new_calendar = [...calendarItems];
+            response.data.availabilities.forEach((availability) => {
+              if (availability.person == loggedInUserId) {
+                calendarItems.forEach((item, i) => {
+                  item.items.forEach((piece, j) => {
+                    if (piece.time_start === availability.start_time.slice(0, 16)) {
+                      new_calendar[i].items[j].availability = availability.type;
+                    }
+                  });
+                });
+              }
             });
+            setCalendarItems(new_calendar);
           }
-        });
-        setCalendarItems(new_calendar);
-      }
-    };
-
+        };
+    }
     if (user.token !== "") {
       getCalendarItems();
     }
-  }
-  }, []);
+  }, [ref]);
 
   return (
     <div className="calendar">
