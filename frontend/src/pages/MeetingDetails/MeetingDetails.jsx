@@ -9,7 +9,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { EVENT_URL, TOKEN_URL, USER_URL } from "../../constants";
 
 const MeetingDetails = () => {
-  const {user, logout} = useAuth();
+  const {user} = useAuth();
   const [eventName, setEventName] = useState("");
   const [invitee, setInvitee] = useState("");
   const [deadline, setDeadline] = useState("");

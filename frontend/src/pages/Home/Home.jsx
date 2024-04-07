@@ -203,8 +203,8 @@ const Home = () => {
                                     <span className='due'>
                                         due{' '}
                                         {new Date(
-                                            request.deadline
-                                        ).toLocaleString()}
+                                            new Date(request.deadline).getTime() + 5 * 60 * 60 * 1000)
+                                            .toLocaleString()}
                                     </span>
                                     <button
                                         className='add-availability button-primary'
@@ -239,8 +239,8 @@ const Home = () => {
                                     <span className='due'>
                                         due{' '}
                                         {new Date(
-                                            meeting.selected_time
-                                        ).toLocaleString()}
+                                            new Date(meeting.deadline).getTime() + 5 * 60 * 60 * 1000)
+                                            .toLocaleString()}
                                     </span>
                                     <button
                                         className='add-availability button-secondary'
