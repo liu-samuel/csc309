@@ -337,6 +337,13 @@ const Calendar = forwardRef((props, ref) => {
   }, [ref]);
 
   return (
+    <>
+    <div className="md-calendar-mobile-buttons">
+      <button className="md-button-primary md-calendar-button" onClick={prevWeek} >
+        Previous Day
+      </button>
+      <button className="md-button-primary md-calendar-button" onClick={nextWeek}>Next Day</button>
+    </div>
     <div className="calendar">
       <div className="calendar-header">
         <h2>
@@ -356,12 +363,14 @@ const Calendar = forwardRef((props, ref) => {
       </div>
       <div className="calendar-container">
         <div className="week-buttons">
-          <button onClick={prevWeek} className="button-primary prev-week">
-            Previous {calendarColumns > 1 ? "Week" : "Day"}
+          {calendarColumns > 1 ?
+          (<><button onClick={prevWeek} className="button-primary prev-week">
+            Previous Week
           </button>
           <button onClick={nextWeek} className="button-primary prev-week">
-            Next {calendarColumns > 1 ? "Week" : "Day"}
-          </button>
+            Next Week
+          </button></>)
+          : (<></>)}
 
           {props.editable ? (
             <button onClick={updateAvailabilities} className="button-primary">
@@ -384,7 +393,6 @@ const Calendar = forwardRef((props, ref) => {
                       onClick={() => {
                         handleAvailabilityChange(index, i);
                       }}
-                      data-block={row.items[i].time_start}
                       style={
                         row.items[i].other_availability && row.items[i].availability
                           ? { backgroundColor: "#096560" }
@@ -407,6 +415,7 @@ const Calendar = forwardRef((props, ref) => {
         </table>
       </div>
     </div>
+    </>
   );
 });
 

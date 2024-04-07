@@ -63,14 +63,6 @@ const NewMeeting = () => {
                     New Meeting With <span className='attending-name'>{user.firstName} {user.lastName}</span>
                 </h1>
                 <Calendar ref={childRef}/>
-                <div className='calendar-mobile-buttons'>
-                    <button className='button-primary calendar-button'>
-                        Previous Day
-                    </button>
-                    <button className='button-primary calendar-button'>
-                        Next Day
-                    </button>
-                </div>
 
                 <div className='event-name'>
                     <div className='form-label'>Event Name</div>

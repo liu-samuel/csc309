@@ -84,12 +84,12 @@ const MeetingDetails = () => {
           Meeting Details: <span className="md-attending-name">{eventName}</span>
         </h1>
         <Calendar editable event_id={event_id} />
-        <div className="md-calendar-mobile-buttons">
+        {/* <div className="md-calendar-mobile-buttons">
           <button className="md-button-primary md-calendar-button">
             Previous Day
           </button>
           <button className="md-button-primary md-calendar-button">Next Day</button>
-        </div>
+        </div> */}
 
         <div className="md-bottom-wrapper">
           <div className="md-deadline">
