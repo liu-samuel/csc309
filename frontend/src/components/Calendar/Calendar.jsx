@@ -234,22 +234,10 @@ const Calendar = forwardRef((props, ref) => {
       props.setSelected(false)
       setSelectedEvent(null)
     }
-  }, [props.scheduling])
-
-  const updateAvailabilities = (e) => {
-    // delete all availabilities for the days
-    // add availabilities
-    if (user.token !== "") {
-      setAvailability(loggedInEmail);
-      return;
-    }
-    // TODO: handle error with token
-  };
+  }, [props.scheduling]);
 
   const [startDate, setStartDate] = useState(new Date());
-  const [loggedInEmail, setLoggedInEmail] = useState("user1@user1.com");
   const {user} = useAuth();
-  const [loggedInUserId, setLoggedInUserId] = useState(1);
   const [calendarItems, setCalendarItems] = useState(
     Array.from({ length: 48 }, (_, i) => {
       return {
@@ -277,6 +265,16 @@ const Calendar = forwardRef((props, ref) => {
     })
   );
 
+  const updateAvailabilities = (e) => {
+    // delete all availabilities for the days
+    // add availabilities
+    if (user.token !== "") {
+      setAvailability(user.email);
+      return;
+    }
+    // TODO: handle error with token
+  };
+
   const updateCalendarItems = async (resetCalendar) => {
     if (props.event_id) {
       const response = await axios.get(`${EVENT_URL}${props.event_id}/`, {
@@ -288,7 +286,7 @@ const Calendar = forwardRef((props, ref) => {
       if (response.statusText === "OK") {
         let new_calendar = [...resetCalendar];
         response.data.availabilities.forEach((availability) => {
-          if (availability.person == loggedInUserId) {
+          if (availability.person === user.id) {
             resetCalendar.forEach((item, i) => {
               item.items.forEach((piece, j) => {
                 if (piece.time_start === availability.start_time.slice(0, 16)) {
@@ -348,7 +346,7 @@ const Calendar = forwardRef((props, ref) => {
           if (response.statusText === "OK") {
             let new_calendar = [...calendarItems];
             response.data.availabilities.forEach((availability) => {
-              if (availability.person == loggedInUserId) {
+              if (availability.person === user.id) {
                 calendarItems.forEach((item, i) => {
                   item.items.forEach((piece, j) => {
                     if (piece.time_start === availability.start_time.slice(0, 16)) {
