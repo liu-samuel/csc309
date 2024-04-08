@@ -85,11 +85,11 @@ const Calendar = forwardRef((props, ref) => {
               new Date(cell.time_start + "Z").getTime() + 30 * 60000
             )
               .toISOString()
-              .slice(0, 16);
+              .slice(0, 16) + "Z";
 
             const body = {
               email: email,
-              start_time: cell.time_start,
+              start_time: cell.time_start + "Z",
               end_time,
               type: cell.availability,
             };
@@ -230,7 +230,7 @@ const Calendar = forwardRef((props, ref) => {
   };
 
   useEffect(() => {
-    if (!props.scheduling) {
+    if (!props.scheduling && props.setSelected) {
       props.setSelected(false)
       setSelectedEvent(null)
     }
@@ -394,6 +394,7 @@ const Calendar = forwardRef((props, ref) => {
       );
 
       props.setScheduled(true);
+      props.setEventTime(selectedEvent.time_start);
     }
     catch (error) {
       console.log("Error scheduling event", error);

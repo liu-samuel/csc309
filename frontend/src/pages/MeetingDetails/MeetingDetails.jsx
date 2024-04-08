@@ -56,7 +56,7 @@ const MeetingDetails = () => {
         });
 
         setEventName(response.data.name);
-        setDeadline(convertStringToDate(response.data.deadline.slice(0, 16)));
+        response.data.deadline ? setDeadline(convertStringToDate(response.data.deadline.slice(0, 16))) : console.log("no deadline found");
         setAgenda(response.data.agenda);
         setScheduled(response.data.is_finalized);
         setEventTime(response.data.selected_time);
@@ -101,13 +101,13 @@ const MeetingDetails = () => {
         </h1>
         {scheduled ?
         <div className="md-scheduled-meeting"> 
-        <h2>You have already scheduled this event for:
+        <h2>You have scheduled this event for:
         </h2><br/>
         <h2 className="md-attending-name">{convertStringToDate(eventTime)}</h2>
          <div className="md-button md-button-primary" onClick={() => {setScheduled(false)}}>Reschedule?</div>
         </div>
         : 
-        <><Calendar editable event_id={event_id} scheduling={scheduling} setSelected={setSelected} setScheduled={setScheduled} />
+        <><Calendar editable event_id={event_id} scheduling={scheduling} setSelected={setSelected} setScheduled={setScheduled} setEventTime={setEventTime} />
 
         <div className="md-bottom-wrapper">
           <div className="md-deadline">
