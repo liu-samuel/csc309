@@ -230,7 +230,7 @@ const Calendar = forwardRef((props, ref) => {
   };
 
   useEffect(() => {
-    if (!props.scheduling) {
+    if (props.event_id  && !props.scheduling) {
       props.setSelected(false)
       setSelectedEvent(null)
     }
