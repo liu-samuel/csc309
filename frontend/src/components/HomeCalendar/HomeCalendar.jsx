@@ -56,7 +56,13 @@ const HomeCalendar = ({ events }) => {
 
     // Function to check if an event is on a given date and time
     const isEventOnDateTime = (event, date) => {
-        const eventDate = new Date(event.selected_time)
+        const year = parseInt(event.selected_time.substring(0, 4));
+        const month = parseInt(event.selected_time.substring(5, 7)) - 1; 
+        const day = parseInt(event.selected_time.substring(8, 10));
+        const hours = parseInt(event.selected_time.substring(11, 13));
+        const minutes = parseInt(event.selected_time.substring(14, 16));
+        const seconds = parseInt(event.selected_time.substring(17, 19));
+        const eventDate = new Date(year, month, day, hours, minutes, seconds)
         return (
             eventDate.toDateString() === date.toDateString() &&
             eventDate.getHours() === date.getHours() &&

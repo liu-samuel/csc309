@@ -85,11 +85,11 @@ const Calendar = forwardRef((props, ref) => {
               new Date(cell.time_start + "Z").getTime() + 30 * 60000
             )
               .toISOString()
-              .slice(0, 16) + "Z";
+              .slice(0, 16);
 
             const body = {
               email: email,
-              start_time: cell.time_start + "Z",
+              start_time: cell.time_start,
               end_time,
               type: cell.availability,
             };
