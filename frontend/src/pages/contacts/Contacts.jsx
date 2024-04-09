@@ -204,7 +204,7 @@ const Contacts = () => {
                                     <div className='initial-pic'>
                                         {item.name
                                             .split(' ')
-                                            .map(word => word[0])
+                                            .map(word => word[0].toUpperCase())
                                             .join('')}
                                     </div>
                                     <div className='name-email'>
