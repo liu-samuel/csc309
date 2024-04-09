@@ -10,3 +10,6 @@ export const EVENT_AVAILABILITY_URL = event_id => {
 }
 export const CURRENT_USER_URL =
     'http://localhost:8000/accounts/user/current_user/'
+export const SUGGESTED_TIME_URL = event_id => {
+    return `http://localhost:8000/schedules/events/${event_id}/suggestion/`
+}

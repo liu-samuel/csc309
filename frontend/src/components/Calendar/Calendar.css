@@ -259,3 +259,13 @@ td:nth-child(2) {
     align-items: center;
     max-height: 620px;
 }
+
+.calendar-list-suggestions {
+    font-size: 2rem;
+    text-decoration: underline;
+}
+
+.calendar-list-suggestions:hover {
+    color: #0000EE;
+    cursor: pointer;
+}

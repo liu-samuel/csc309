@@ -1,8 +1,9 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle, useLayoutEffect } from "react";
 import "./Calendar.css";
 import axios from "axios";
-import { EVENT_AVAILABILITY_URL, EVENT_URL, TOKEN_URL } from "../../constants";
+import { EVENT_AVAILABILITY_URL, EVENT_URL, SUGGESTED_TIME_URL, TOKEN_URL } from "../../constants";
 import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from 'react-router-dom'
 
 function useWindowSize() {
   const [size, setSize] = useState([0, 0]);
@@ -23,6 +24,9 @@ const Calendar = forwardRef((props, ref) => {
   const [width, _] = useWindowSize();
   const [calendarColumns, setCalendarColumns] = useState(4);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [suggestedTimes, setSuggestedTimes] = useState([]);
+  const [isSuggestingTimes, setIsSuggestingTimes] = useState(false);
+  const navigate = useNavigate()
 
   useEffect(() => {
     const updateCalendarColumns = () => {
@@ -275,37 +279,72 @@ const Calendar = forwardRef((props, ref) => {
     // TODO: handle error with token
   };
 
-  const updateCalendarItems = async (resetCalendar) => {
-    if (props.event_id) {
-      const response = await axios.get(`${EVENT_URL}${props.event_id}/`, {
+  const getSuggestions = async () => {
+    try {
+      const response = await axios.get(`${SUGGESTED_TIME_URL(props.event_id)}`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
-      });
+      })
 
       if (response.statusText === "OK") {
-        let new_calendar = [...resetCalendar];
-        response.data.availabilities.forEach((availability) => {
-          if (availability.person === user.id) {
-            resetCalendar.forEach((item, i) => {
-              item.items.forEach((piece, j) => {
-                if (piece.time_start === availability.start_time.slice(0, 16)) {
-                  new_calendar[i].items[j].availability = availability.type;
-                }
-              });
-            });
-          } else {
-            resetCalendar.forEach((item, i) => {
-              item.items.forEach((piece, j) => {
-                if (piece.time_start === availability.start_time.slice(0, 16)) {
-                  new_calendar[i].items[j].other_availability = availability.type;
-                }
-              });
-            });
-          }
-        });
-        setCalendarItems(new_calendar);
+        const suggestions = response.data;
+        const timeSuggestions = []
+        for (var i = 0; i < suggestions.length; i++) {
+          const suggestion = suggestions[i];
+          console.log("suggestion:", suggestion);
+          timeSuggestions.push({start_time: suggestion.start_time, end_time: suggestion.end_time});
+        }
+
+        setSuggestedTimes(timeSuggestions);
+        setIsSuggestingTimes(true);
+
+        console.log("suggested times:",suggestions);
       }
+    } catch (err) {
+      console.log("error getting suggested times", err);
+    }
+  }
+
+  const updateCalendarItems = async (resetCalendar) => {
+    if (props.event_id) {
+      try {
+        const response = await axios.get(`${EVENT_URL}${props.event_id}/`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+
+        if (response.statusText === "OK") {
+          let new_calendar = [...resetCalendar];
+          response.data.availabilities.forEach((availability) => {
+            if (availability.person === user.id) {
+              resetCalendar.forEach((item, i) => {
+                item.items.forEach((piece, j) => {
+                  if (piece.time_start === availability.start_time.slice(0, 16)) {
+                    new_calendar[i].items[j].availability = availability.type;
+                  }
+                });
+              });
+            } else {
+              resetCalendar.forEach((item, i) => {
+                item.items.forEach((piece, j) => {
+                  if (piece.time_start === availability.start_time.slice(0, 16)) {
+                    new_calendar[i].items[j].other_availability = availability.type;
+                  }
+                });
+              });
+            }
+          });
+          setCalendarItems(new_calendar);
+        }
+      } catch (error) {
+        if (error.response.status === 404) {
+          navigate('/home')
+        }
+        console.log("error getting calendar items", error);
+      }
+
     }
   };
 
@@ -337,37 +376,45 @@ const Calendar = forwardRef((props, ref) => {
   useEffect(() => {
       const getCalendarItems = async () => {
         if (props.event_id) {
-          const response = await axios.get(`${EVENT_URL}${props.event_id}/`, {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          });
-
-          if (response.statusText === "OK") {
-            let new_calendar = [...calendarItems];
-            response.data.availabilities.forEach((availability) => {
-              if (availability.person === user.id) {
-                calendarItems.forEach((item, i) => {
-                  item.items.forEach((piece, j) => {
-                    if (piece.time_start === availability.start_time.slice(0, 16)) {
-                      new_calendar[i].items[j].availability = availability.type;
-                    }
-                  });
-                });
-              } else {
-                calendarItems.forEach((item, i) => {
-                  item.items.forEach((piece, j) => {
-                    if (piece.time_start === availability.start_time.slice(0, 16)) {
-                      new_calendar[i].items[j].other_availability = availability.type;
-                    }
-                  });
-                });
-              }
+          try {
+            const response = await axios.get(`${EVENT_URL}${props.event_id}/`, {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
             });
-            setCalendarItems(new_calendar);
-            console.log(new_calendar);
+
+            if (response.statusText === "OK") {
+              let new_calendar = [...calendarItems];
+              response.data.availabilities.forEach((availability) => {
+                if (availability.person === user.id) {
+                  calendarItems.forEach((item, i) => {
+                    item.items.forEach((piece, j) => {
+                      if (piece.time_start === availability.start_time.slice(0, 16)) {
+                        new_calendar[i].items[j].availability = availability.type;
+                      }
+                    });
+                  });
+                } else {
+                  calendarItems.forEach((item, i) => {
+                    item.items.forEach((piece, j) => {
+                      if (piece.time_start === availability.start_time.slice(0, 16)) {
+                        new_calendar[i].items[j].other_availability = availability.type;
+                      }
+                    });
+                  });
+                }
+              });
+              setCalendarItems(new_calendar);
+              console.log(new_calendar);
+            }
+          } catch (error) {
+            if (error.response.status === 404) {
+              navigate('/home')
+            }
+            console.log("error getting calendar items", error);
           }
-        };
+
+        }
     }
     if (user.token !== "") {
       getCalendarItems();
@@ -429,6 +476,24 @@ const Calendar = forwardRef((props, ref) => {
         <h1>You have selected the following date/time:<br/><span>{convertStringToDate(selectedEvent.time_start)}</span> <br/> (30 minute meeting)</h1>
         <button className="md-button-primary md-calendar-button" onClick={scheduleEvent} >Schedule Event</button>
         <button className="md-button-primary md-calendar-button" onClick={() => {props.setSelected(false); setSelectedEvent(null)}}>Cancel</button></>)
+        : isSuggestingTimes
+        ? (<>
+          <h1>Suggested meeting times</h1>
+          {suggestedTimes.length === 0 ? <h2>Sorry, there are no suggested times because there is no overlap, or the other person hasn't filled out their availability yet.</h2> :
+          <ul>
+            {suggestedTimes.map((time, i) => (
+              <li className="calendar-list-suggestions" onClick={() => {
+                console.log("suggested start time:", time.start_time);
+                setSelectedEvent({time_start: time.start_time.slice(0, 10) + "T" + time.start_time.slice(11, 16)}); 
+                setIsSuggestingTimes(false);
+                setSuggestedTimes([]);
+              }
+              }>{convertStringToDate(time.start_time) + " - " + convertStringToDate(time.end_time)}</li>
+            ))}
+          </ul>
+          }
+          <button className="md-button-primary md-calendar-button" onClick={() => {setSuggestedTimes([]);setIsSuggestingTimes(false);}}>Cancel</button>
+        </>)
         :
         <div className="calendar-container">
           <div className="week-buttons">
@@ -442,9 +507,14 @@ const Calendar = forwardRef((props, ref) => {
             : (<></>)}
 
             {props.editable ? (
-              <button onClick={updateAvailabilities} className="button-primary">
-                Save Availability
-              </button>
+              <>
+                <button onClick={updateAvailabilities} className="button-primary prev-week">
+                  Save Availability
+                </button>
+                <button onClick={getSuggestions} className="button-primary">
+                  Meeting time suggestions
+                </button>
+              </>
             ) : (
               <></>
             )}
