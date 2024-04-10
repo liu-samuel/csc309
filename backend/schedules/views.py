@@ -639,8 +639,9 @@ class SuggestionAPIView(APIView):
         invitee = event.invitee
         owner = event.owner
 
-        invitee_availabilities = Availability.objects.filter(person_id=invitee.id)
-        owner_availabilities = Availability.objects.filter(person_id=owner.id)
+        invitee_availabilities = Availability.objects.filter(event_id=event_id, person_id=invitee.id)
+        owner_availabilities = Availability.objects.filter(event_id=event_id, person_id=owner.id)
+
 
         overlapping_times = set()
         for a1 in owner_availabilities:
