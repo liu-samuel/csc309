@@ -196,8 +196,7 @@ class EventAPIView(generics.CreateAPIView):
 
         is_finalized = request.data.get("is_finalized")
         name = request.data.get("name")
-        selected_time = request.data.get("selected_time")
-
+        selected_time = request.data.get("selected_time") 
         # if any of these were not passed in, don't update that value
         if is_finalized != None:
             event.is_finalized = is_finalized
@@ -665,3 +664,22 @@ class SuggestionAPIView(APIView):
 
         overlapping_times = [{'start_time': start_time, 'end_time': end_time} for start_time, end_time in overlapping_times]
         return Response(overlapping_times)
+
+class EditAgendaAPIView(APIView): 
+    def patch(self, request, **kwargs):
+        event_id = kwargs["event_id"]
+        try:
+            event = Event.objects.get(pk=event_id)
+        except:
+            return Response({'error': f'Event does not exist with id {event_id}'}, status=status.HTTP_404_NOT_FOUND)
+    
+        new_agenda = request.data.get("agenda")
+
+        event.agenda = new_agenda
+        try:
+            event.save()
+
+            serializer = EventSerializer(event)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ValidationError as e:
+            return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
