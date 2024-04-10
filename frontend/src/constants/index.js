@@ -13,3 +13,7 @@ export const CURRENT_USER_URL =
 export const SUGGESTED_TIME_URL = event_id => {
     return `http://localhost:8000/schedules/events/${event_id}/suggestion/`
 }
+
+export const AGENDA_URL = event_id => {
+    return `http://localhost:8000/schedules/events/${event_id}/agenda/`
+}

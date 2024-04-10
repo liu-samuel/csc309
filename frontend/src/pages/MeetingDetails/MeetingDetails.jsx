@@ -6,7 +6,7 @@ import NavBar from "../../components/NavBar/NavBar";
 import Footer from "../../components/Footer/Footer";
 import Calendar from "../../components/Calendar/Calendar";
 import { useAuth } from "../../contexts/AuthContext";
-import { EVENT_URL, TOKEN_URL, USER_URL } from "../../constants";
+import { EVENT_URL, TOKEN_URL, USER_URL, AGNEDA_URL, AGENDA_URL } from "../../constants";
 
 const MeetingDetails = () => {
   const {user} = useAuth();
@@ -18,8 +18,39 @@ const MeetingDetails = () => {
   const [selected, setSelected] = useState(false);
   const [scheduled, setScheduled] = useState(false);
   const [eventTime, setEventTime] = useState("");
+  const [editing, setEditing] = useState(false);
 
   const { event_id } = useParams();
+
+  function editAgenda() {
+    var container = document.querySelector('.meeting-agenda');
+    container.contentEditable = true;
+    setEditing(true);
+    container.classList.add('editing-mode');
+    container.focus();
+  }
+
+  async function saveAgenda() {
+    setEditing(false);
+    
+    var container = document.querySelector('.meeting-agenda');
+    var editedContent = container.innerText;
+    container.contentEditable = false;
+    container.classList.remove('editing-mode');
+      try {
+        const response = await axios.patch(`${AGENDA_URL(event_id)}`, {
+          agenda: editedContent 
+      }, {
+          headers: {
+              Authorization: `Bearer ${user.token}`,
+          },
+      });
+    } catch (error) {
+      console.error("Error updating agenda");
+    }
+
+
+  }
 
   function convertStringToDate(str) {
     const map = [
@@ -125,7 +156,14 @@ const MeetingDetails = () => {
           <div className="meeting-agenda"> 
             {agenda}
           </div>
+          
         </div>
+        <div className="agenda-button-container">
+          <button className="md-button-primary edit-agenda" onClick={editing ? saveAgenda : editAgenda}>
+            {editing ? "Save" : "Edit"}
+          </button>
+        </div>
+        
       </div>
 
       <Footer />
